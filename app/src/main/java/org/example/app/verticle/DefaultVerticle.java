@@ -6,6 +6,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
+import java.util.Objects;
 import org.example.app.di.DaggerProvider;
 import org.example.app.di.Provider;
 import org.example.app.web.RouterFactory;
@@ -24,6 +25,7 @@ public class DefaultVerticle extends AbstractVerticle {
   }
 
   public int getPort() {
+    Objects.requireNonNull(httpServer, "httpServer is null");
     return httpServer.actualPort();
   }
 
@@ -59,23 +61,23 @@ public class DefaultVerticle extends AbstractVerticle {
   public void stop(Promise<Void> stopPromise) {
     log.info("Stopping verticle");
 
-    if (null != httpServer) {
-      log.info("Stopping http server");
-      httpServer
-          .close()
-          .onComplete(
-              e -> {
-                if (e.succeeded()) {
-                  log.info("http server closed");
-                  stopPromise.complete();
-                } else {
-                  log.error("stopping http server failed", e.cause());
-                  stopPromise.fail(e.cause());
-                }
-              });
+    if (null == httpServer) {
+      stopPromise.complete();
       return;
     }
 
-    stopPromise.complete();
+    log.info("Stopping http server");
+    httpServer
+        .close()
+        .onComplete(
+            e -> {
+              if (e.succeeded()) {
+                log.info("http server closed");
+                stopPromise.complete();
+              } else {
+                log.error("stopping http server failed", e.cause());
+                stopPromise.fail(e.cause());
+              }
+            });
   }
 }
