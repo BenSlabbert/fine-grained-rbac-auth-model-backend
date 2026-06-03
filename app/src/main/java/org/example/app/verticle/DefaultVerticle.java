@@ -34,9 +34,12 @@ public class DefaultVerticle extends AbstractVerticle {
   public void start(Promise<Void> startPromise) {
     log.info("Starting verticle");
     vertx.exceptionHandler(throwable -> log.error("unhandled exception", throwable));
-    ApplicationConfig applicationConfig = ApplicationConfig.fromJson(config());
     provider =
-        DaggerProvider.builder().vertx(vertx).appConfig(applicationConfig).config(config()).build();
+        DaggerProvider.builder()
+            .vertx(vertx)
+            .appConfig(ApplicationConfig.fromJson(config()))
+            .config(config())
+            .build();
     provider.init();
 
     ServerFactory serverFactory = provider.serverFactory();
