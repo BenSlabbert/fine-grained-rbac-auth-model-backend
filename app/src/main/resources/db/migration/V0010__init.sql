@@ -1,0 +1,10 @@
+CREATE
+  SEQUENCE id_sequence
+START WITH
+  1 INCREMENT BY 1;
+
+CREATE
+  TABLE
+    example(
+      id BIGINT NOT NULL PRIMARY KEY
+    );

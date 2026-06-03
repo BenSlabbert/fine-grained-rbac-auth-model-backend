@@ -23,10 +23,10 @@ final class DataSourceProvider {
     Objects.requireNonNull(postgresConfig, "postgresConfig is null");
 
     hikariConfig.setJdbcUrl(postgresConfig.uri());
-    hikariConfig.setUsername("postgres");
-    hikariConfig.setPassword("postgres");
+    hikariConfig.setUsername(postgresConfig.username());
+    hikariConfig.setPassword(postgresConfig.password());
     hikariConfig.setAutoCommit(false);
-    hikariConfig.setMaximumPoolSize(1);
+    hikariConfig.setMaximumPoolSize(2);
     hikariConfig.setPoolName("jdbc");
     hikariConfig.setThreadFactory(Thread.ofVirtual().name("v-", 0L).factory());
 

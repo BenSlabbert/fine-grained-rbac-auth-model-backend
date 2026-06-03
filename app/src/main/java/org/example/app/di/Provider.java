@@ -13,10 +13,13 @@ import io.vertx.core.json.JsonObject;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import javax.sql.DataSource;
 import org.example.app.config.ConfigModule;
 import org.example.app.web.RouterFactory;
 import org.example.app.web.ServerFactory;
 import org.example.app.web.WebModule;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.output.MigrateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +66,28 @@ public interface Provider {
     EagerModule() {}
 
     @Provides
-    @Nullable static Void provideEager(TransactionManager transactionManager) {
+    @Nullable static Void provideEager(TransactionManager transactionManager, DataSource dataSource) {
       log.info("eager init");
       PlatformTransactionManager.setTransactionManager(transactionManager);
+
+      Flyway flyway =
+          Flyway.configure()
+              .dataSource(dataSource)
+              .validateMigrationNaming(true)
+              .validateOnMigrate(true)
+              .failOnMissingLocations(true)
+              .load();
+
+      MigrateResult result = flyway.migrate();
+      if (result.success) {
+        log.info(
+            "flyway migration complete: {} migrations applied in {}ms",
+            result.migrationsExecuted,
+            result.getTotalMigrationTime());
+      } else {
+        throw new IllegalStateException("flyway migration failed");
+      }
+
       return null;
     }
   }

@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.app.web.route;
 
+import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
 import github.benslabbert.vdw.codegen.annotation.transaction.Transactional;
 import github.benslabbert.vdw.codegen.annotation.transaction.Transactional.Propagation;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
@@ -17,6 +18,7 @@ class Ping {
   @Inject
   Ping() {}
 
+  @HasRole("admin")
   @Get
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   String ping() {

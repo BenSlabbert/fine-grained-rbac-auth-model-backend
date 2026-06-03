@@ -11,6 +11,10 @@ dependencies {
     implementation(libs.vdw.logging)
     implementation(libs.vdw.annotation)
     implementation(libs.vdw.platform)
+    implementation(libs.flyway)
+
+    runtimeOnly("org.postgresql:postgresql:42.7.11")
+
     testImplementation(testFixtures(libs.vdw.commons.test))
 
     annotationProcessor(libs.hibernate.validator.annotation.processor)

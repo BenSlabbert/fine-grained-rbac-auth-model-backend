@@ -6,7 +6,7 @@
     "host" : "localhost",
     "port" : 5432,
     "database" : "iam",
-    "username" : "user",
+    "username" : "username",
     "password" : "password",
     "schema" : "public"
   }

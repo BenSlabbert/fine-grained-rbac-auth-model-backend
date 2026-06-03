@@ -2,6 +2,7 @@
 vdw = "4.76.0"
 hibernate-validator = "9.1.0.Final"
 org-mapstruct-mapstruct = "1.6.3"
+flyway = "12.7.0"
 
 [libraries]
 vdw-launcher = { module = "github.benslabbert.vdw.codegen:launcher", version.ref = "vdw" }
@@ -18,3 +19,4 @@ vdw-advice-transformer = { module = "github.benslabbert.vdw.codegen:advice-trans
 hibernate-validator-annotation-processor = { module = "org.hibernate.validator:hibernate-validator-annotation-processor", version.ref = "hibernate-validator" }
 org-mapstruct-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct-mapstruct" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct-mapstruct" }
+flyway = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
