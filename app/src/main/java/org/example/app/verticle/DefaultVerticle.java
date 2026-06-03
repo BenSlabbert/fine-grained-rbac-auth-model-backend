@@ -19,6 +19,7 @@ public class DefaultVerticle extends AbstractVerticle {
   private static final Logger log = LoggerFactory.getLogger(DefaultVerticle.class);
 
   private volatile HttpServer httpServer = null;
+  private volatile Provider provider = null;
 
   private void setHttpServer(HttpServer httpServer) {
     this.httpServer = httpServer;
@@ -34,7 +35,7 @@ public class DefaultVerticle extends AbstractVerticle {
     log.info("Starting verticle");
     vertx.exceptionHandler(throwable -> log.error("unhandled exception", throwable));
     ApplicationConfig applicationConfig = ApplicationConfig.fromJson(config());
-    Provider provider =
+    provider =
         DaggerProvider.builder().vertx(vertx).appConfig(applicationConfig).config(config()).build();
     provider.init();
 
@@ -71,6 +72,8 @@ public class DefaultVerticle extends AbstractVerticle {
         .close()
         .onComplete(
             e -> {
+              provider.closeSilently();
+
               if (e.succeeded()) {
                 log.info("http server closed");
                 stopPromise.complete();

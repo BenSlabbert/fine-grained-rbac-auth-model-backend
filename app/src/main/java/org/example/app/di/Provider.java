@@ -32,6 +32,14 @@ public interface Provider {
 
   @Nullable Void init();
 
+  default void closeSilently() {
+    try {
+      PlatformTransactionManager.close();
+    } catch (Exception e) {
+      log.error("Error closing transaction manager", e);
+    }
+  }
+
   @Component.Builder
   interface Builder {
 
