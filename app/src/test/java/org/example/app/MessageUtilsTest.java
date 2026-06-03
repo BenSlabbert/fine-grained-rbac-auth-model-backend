@@ -4,11 +4,11 @@
 package org.example.app;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MessageUtilsTest {
-    @Test void testGetMessage() {
-        assertEquals("Hello      World!", MessageUtils.getMessage());
-    }
+  @Test
+  void testGetMessage() {
+    assertThat("Hello      World!").isEqualTo(MessageUtils.getMessage());
+  }
 }
