@@ -34,6 +34,7 @@ public interface Provider {
 
   default void closeSilently() {
     try {
+      log.info("Closing transaction manager");
       PlatformTransactionManager.close();
     } catch (Exception e) {
       log.error("Error closing transaction manager", e);
