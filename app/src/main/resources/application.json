@@ -1,0 +1,13 @@
+{
+  "httpConfig": {
+    "port": 8080
+  },
+  "postgresConfig": {
+    "host" : "localhost",
+    "port" : 5432,
+    "database" : "iam",
+    "username" : "user",
+    "password" : "password",
+    "schema" : "public"
+  }
+}

@@ -1,5 +1,7 @@
 [versions]
 vdw = "4.76.0"
+hibernate-validator = "9.1.0.Final"
+org-mapstruct-mapstruct = "1.6.3"
 
 [libraries]
 vdw-launcher = { module = "github.benslabbert.vdw.codegen:launcher", version.ref = "vdw" }
@@ -13,3 +15,6 @@ vdw-aop = { module = "github.benslabbert.vdw.codegen:aop", version.ref = "vdw" }
 vdw-logging = { module = "github.benslabbert.vdw.codegen:logging", version.ref = "vdw" }
 vdw-agent = { module = "github.benslabbert.vdw.codegen:agent", version.ref = "vdw" }
 vdw-advice-transformer = { module = "github.benslabbert.vdw.codegen:advice-transformer", version.ref = "vdw" }
+hibernate-validator-annotation-processor = { module = "org.hibernate.validator:hibernate-validator-annotation-processor", version.ref = "hibernate-validator" }
+org-mapstruct-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct-mapstruct" }
+org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct-mapstruct" }
