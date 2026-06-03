@@ -4,4 +4,5 @@ plugins {
 }
 
 rootProject.name = "backend"
+
 include("app", "list", "utilities")

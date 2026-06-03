@@ -1,15 +1,14 @@
 import java.util.Properties
 
-plugins {
-    java
-}
+plugins { java }
 
-val localEnv = Properties().apply {
-    val envFile = rootProject.file(".local-env")
-    if (envFile.isFile) {
-        envFile.inputStream().use { load(it) }
+val localEnv =
+    Properties().apply {
+        val envFile = rootProject.file(".local-env")
+        if (envFile.isFile) {
+            envFile.inputStream().use { load(it) }
+        }
     }
-}
 
 repositories {
     mavenLocal()
@@ -23,12 +22,6 @@ repositories {
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
+tasks.named<Test>("test") { useJUnitPlatform() }

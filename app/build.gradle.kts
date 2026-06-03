@@ -1,6 +1,4 @@
-plugins {
-    id("buildlogic.java-application-conventions")
-}
+plugins { id("buildlogic.java-application-conventions") }
 
 dependencies {
     implementation(project(":utilities"))

@@ -1,7 +1,3 @@
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+plugins { id("buildlogic.java-library-conventions") }
 
-dependencies {
-    testImplementation(testFixtures(libs.vdw.commons.test))
-}
+dependencies { testImplementation(testFixtures(libs.vdw.commons.test)) }
