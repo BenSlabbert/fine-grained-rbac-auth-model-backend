@@ -3,6 +3,8 @@ vdw = "4.76.0"
 hibernate-validator = "9.1.0.Final"
 org-mapstruct-mapstruct = "1.6.3"
 flyway = "12.7.0"
+postgresql = "42.7.11"
+google-auto = "1.11.1"
 
 [libraries]
 vdw-launcher = { module = "github.benslabbert.vdw.codegen:launcher", version.ref = "vdw" }
@@ -20,3 +22,6 @@ hibernate-validator-annotation-processor = { module = "org.hibernate.validator:h
 org-mapstruct-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct-mapstruct" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct-mapstruct" }
 flyway = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+google-auto-annotations = { module = "com.google.auto.value:auto-value-annotations", version.ref = "google-auto" }
+google-auto-processor = { module = "com.google.auto.value:auto-value", version.ref = "google-auto" }

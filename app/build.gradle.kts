@@ -11,16 +11,17 @@ dependencies {
     implementation(libs.vdw.logging)
     implementation(libs.vdw.annotation)
     implementation(libs.vdw.platform)
-    implementation(libs.flyway)
+    implementation(project(":utilities"))
+    compileOnly(libs.google.auto.annotations)
 
-    runtimeOnly("org.postgresql:postgresql:42.7.11")
+    runtimeOnly(libs.postgresql)
 
     testImplementation(testFixtures(libs.vdw.commons.test))
 
     annotationProcessor(libs.hibernate.validator.annotation.processor)
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
     annotationProcessor(libs.vdw.generator)
-    annotationProcessor("com.google.auto.value:auto-value")
+    annotationProcessor(libs.google.auto.processor)
     "byteBuddy"(libs.vdw.advice.transformer)
     annotationProcessor("com.google.dagger:dagger-compiler")
 }

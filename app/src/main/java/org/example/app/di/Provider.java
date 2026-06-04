@@ -15,16 +15,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import javax.sql.DataSource;
 import org.example.app.config.ConfigModule;
+import org.example.app.entity.EntityModule;
 import org.example.app.web.RouterFactory;
 import org.example.app.web.ServerFactory;
 import org.example.app.web.WebModule;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.output.MigrateResult;
+import org.example.utilities.FlywayUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Component(modules = {Provider.EagerModule.class, ConfigModule.class, WebModule.class})
+@Component(
+    modules = {Provider.EagerModule.class, ConfigModule.class, WebModule.class, EntityModule.class})
 public interface Provider {
 
   Logger log = LoggerFactory.getLogger(Provider.class);
@@ -69,25 +70,7 @@ public interface Provider {
     @Nullable static Void provideEager(TransactionManager transactionManager, DataSource dataSource) {
       log.info("eager init");
       PlatformTransactionManager.setTransactionManager(transactionManager);
-
-      Flyway flyway =
-          Flyway.configure()
-              .dataSource(dataSource)
-              .validateMigrationNaming(true)
-              .validateOnMigrate(true)
-              .failOnMissingLocations(true)
-              .load();
-
-      MigrateResult result = flyway.migrate();
-      if (result.success) {
-        log.info(
-            "flyway migration complete: {} migrations applied in {}ms",
-            result.migrationsExecuted,
-            result.getTotalMigrationTime());
-      } else {
-        throw new IllegalStateException("flyway migration failed");
-      }
-
+      FlywayUtility.migrate(dataSource);
       return null;
     }
   }
