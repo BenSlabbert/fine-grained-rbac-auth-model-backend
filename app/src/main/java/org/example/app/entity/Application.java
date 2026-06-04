@@ -10,9 +10,8 @@ import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 
 @Table
 @GenerateBuilder
-public record Merchant(
+public record Application(
     @Column("id") @Id("id_sequence") long id,
     @Column("version") @Version int version,
-    @Column("name") String name,
-    @Column("psp_id") Reference<Psp> psp)
-    implements Reference<Merchant> {}
+    @Column("name") String name)
+    implements Reference<Application> {}

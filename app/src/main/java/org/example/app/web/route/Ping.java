@@ -1,15 +1,14 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.app.web.route;
 
-import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
-import github.benslabbert.vdw.codegen.annotation.transaction.Transactional;
-import github.benslabbert.vdw.codegen.annotation.transaction.Transactional.Propagation;
+import github.benslabbert.vdw.codegen.annotation.auth.NoAuthCheck;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Get;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NoAuthCheck
 @WebHandler(path = "/ping")
 class Ping {
 
@@ -19,8 +18,6 @@ class Ping {
   Ping() {}
 
   @Get
-  @HasRole("admin")
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   String ping() {
     log.debug("Ping - pong");
     return "pong";

@@ -13,6 +13,5 @@ import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 public record MerchantGroup(
     @Column("id") @Id("id_sequence") long id,
     @Column("version") @Version int version,
-    @Column("merchant_group_id") Reference<MerchantGroup> merchantGroup,
-    @Column("merchant_id") Reference<Merchant> merchant)
+    @Column("name") String name)
     implements Reference<MerchantGroup> {}

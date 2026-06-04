@@ -10,5 +10,8 @@ import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 
 @Table
 @GenerateBuilder
-public record Psp(@Column("id") @Id("id_sequence") long id, @Column("version") @Version int version)
+public record Psp(
+    @Column("id") @Id("id_sequence") long id,
+    @Column("version") @Version int version,
+    @Column("name") String name)
     implements Reference<Psp> {}
