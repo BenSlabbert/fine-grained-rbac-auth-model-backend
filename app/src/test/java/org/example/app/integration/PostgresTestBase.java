@@ -14,19 +14,19 @@ import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
+import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import org.example.app.di.Provider;
 import org.example.app.verticle.DefaultVerticle;
 import org.example.utilities.FlywayUtility;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+@Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
 @ExtendWith(VertxExtension.class)
 public abstract class PostgresTestBase {
 
@@ -36,28 +36,19 @@ public abstract class PostgresTestBase {
     POSTGRES.start();
   }
 
-  private static HikariDataSource sharedDataSource;
   private volatile DefaultVerticle verticle;
-  private volatile WebClient webClient;
 
-  @BeforeAll
-  static void initAll() {
+  private static HikariDataSource getDatasource() {
     HikariConfig hikariConfig = new HikariConfig();
     hikariConfig.setJdbcUrl(POSTGRES.getJdbcUrl());
     hikariConfig.setUsername(POSTGRES.getUsername());
     hikariConfig.setPassword(POSTGRES.getPassword());
     hikariConfig.setAutoCommit(false);
-    hikariConfig.setMaximumPoolSize(1);
+    hikariConfig.setMaximumPoolSize(2);
     hikariConfig.setPoolName("test");
-    hikariConfig.setMaxLifetime(Duration.ofSeconds(1L).toMillis());
     hikariConfig.setThreadFactory(Thread.ofVirtual().name("v-", 0L).factory());
 
-    sharedDataSource = new HikariDataSource(hikariConfig);
-  }
-
-  @AfterAll
-  static void tearDownAll() {
-    sharedDataSource.close();
+    return new HikariDataSource(hikariConfig);
   }
 
   @BeforeEach
@@ -74,6 +65,7 @@ public abstract class PostgresTestBase {
                     .port(POSTGRES.getMappedPort(5432))
                     .build())
             .httpConfig(ApplicationConfig_HttpConfigBuilder.builder().port(0).build())
+            .profile(ApplicationConfig.Profile.DEV)
             .build();
 
     verticle = new DefaultVerticle();
@@ -105,6 +97,8 @@ public abstract class PostgresTestBase {
 
   @AfterEach
   void after() {
-    FlywayUtility.clean(sharedDataSource);
+    try (var ds = getDatasource()) {
+      FlywayUtility.clean(ds);
+    }
   }
 }
