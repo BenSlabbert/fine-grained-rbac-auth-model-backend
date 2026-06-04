@@ -8,7 +8,7 @@ import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Id;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Version;
 import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 
-@Table
+@Table("permission")
 @GenerateBuilder
 public record Permission(
     @Column("id") @Id("id_sequence") long id,

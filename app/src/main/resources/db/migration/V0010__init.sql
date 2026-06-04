@@ -65,3 +65,49 @@ CREATE
         value
       )
     );
+
+CREATE
+  TABLE
+    "user"(
+      id BIGINT NOT NULL PRIMARY KEY,
+      version int4 NOT NULL,
+      name VARCHAR(255) NOT NULL UNIQUE
+    );
+
+CREATE
+  TABLE
+    "role"(
+      id BIGINT NOT NULL PRIMARY KEY,
+      version int4 NOT NULL,
+      name VARCHAR(255) NOT NULL UNIQUE
+    );
+
+CREATE
+  TABLE
+    role_permission(
+      id BIGINT NOT NULL PRIMARY KEY,
+      version int4 NOT NULL,
+      role_id BIGINT NOT NULL,
+      permission_id BIGINT NOT NULL,
+      CONSTRAINT fk_role_permission_role FOREIGN KEY(role_id) REFERENCES "role"(id),
+      CONSTRAINT fk_role_permission_permission FOREIGN KEY(permission_id) REFERENCES permission(id),
+      CONSTRAINT uq_role_permission UNIQUE(
+        role_id,
+        permission_id
+      )
+    );
+
+CREATE
+  TABLE
+    user_role(
+      id BIGINT NOT NULL PRIMARY KEY,
+      version int4 NOT NULL,
+      user_id BIGINT NOT NULL,
+      role_id BIGINT NOT NULL,
+      CONSTRAINT fk_user_role_user FOREIGN KEY(user_id) REFERENCES "user"(id),
+      CONSTRAINT fk_user_role_role FOREIGN KEY(role_id) REFERENCES "role"(id),
+      CONSTRAINT uq_user_role UNIQUE(
+        user_id,
+        role_id
+      )
+    );
