@@ -25,3 +25,11 @@ repositories {
 java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
 
 tasks.named<Test>("test") { useJUnitPlatform() }
+
+tasks.withType<Test>().configureEach {
+    environment(
+        "DOCKER_HOST",
+        "unix:///run/user/${System.getenv("UID") ?: "1000"}/podman/podman.sock",
+    )
+    environment("TESTCONTAINERS_RYUK_DISABLED", "true")
+}

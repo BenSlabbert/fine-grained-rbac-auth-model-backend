@@ -30,6 +30,11 @@ public class DefaultVerticle extends AbstractVerticle {
     return httpServer.actualPort();
   }
 
+  public Provider getProvider() {
+    Objects.requireNonNull(provider, "provider is null");
+    return provider;
+  }
+
   @Override
   public void start(Promise<Void> startPromise) {
     log.info("Starting verticle");

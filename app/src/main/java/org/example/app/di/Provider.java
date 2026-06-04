@@ -34,6 +34,8 @@ public interface Provider {
 
   ServerFactory serverFactory();
 
+  DataSource dataSource();
+
   @Nullable Void init();
 
   default void closeSilently() {

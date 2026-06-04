@@ -1,5 +1,5 @@
 [versions]
-vdw = "4.76.0"
+vdw = "4.78.0"
 hibernate-validator = "9.1.0.Final"
 org-mapstruct-mapstruct = "1.6.3"
 flyway = "12.7.0"
