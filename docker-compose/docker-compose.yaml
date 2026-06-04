@@ -1,0 +1,12 @@
+---
+services:
+  postgres:
+    image: "docker.io/postgres:18.4-alpine3.23"
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_USER: "username"
+      POSTGRES_PASSWORD: "password"
+      DATABASES_TO_CREATE: "iam,another_db,payments"
+    volumes:
+    - "./postgres-init:/docker-entrypoint-initdb.d"

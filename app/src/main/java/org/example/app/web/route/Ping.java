@@ -18,8 +18,8 @@ class Ping {
   @Inject
   Ping() {}
 
-  @HasRole("admin")
   @Get
+  @HasRole("admin")
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   String ping() {
     log.debug("Ping - pong");

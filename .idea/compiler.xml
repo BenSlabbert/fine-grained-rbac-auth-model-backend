@@ -1,6 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hibernate.validator/hibernate-validator-annotation-processor/9.1.0.Final/a4e121746317e1bd41ea3c86868ab322664ee57c/hibernate-validator-annotation-processor-9.1.0.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/github.benslabbert.vdw.codegen/generator/4.76.0/1a335e6f93c8204b394b92116197b5aae6be521b/generator-4.76.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.auto.value/auto-value/1.11.1/ea6b28b677d1d9813d7c980c1d82f7ac07acc58f/auto-value-1.11.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/github.benslabbert.vdw.codegen/commons/4.76.0/fe4b35f4773393c94c28f19b742ffc22c433897b/commons-4.76.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.dagger/dagger-compiler/2.59.2/6aa58d2feecfd89dce15368900a2cfdd8137d71a/dagger-compiler-2.59.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.googlejavaformat/google-java-format/1.35.0/eda07d4a6a67783de179b7fded4506a61cea3171/google-java-format-1.35.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.palantir.javapoet/javapoet/0.16.0/44d235746877fb585ea74ba62417c0dc0e89a15c/javapoet-0.16.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/github.benslabbert.vdw.codegen/annotation/4.76.0/57261bbba46881067cc96b5d731cdd56c2398a61/annotation-4.76.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.annotation/jakarta.annotation-api/3.0.0/54f928fadec906a99d558536756d171917b9d936/jakarta.annotation-api-3.0.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.dagger/dagger-spi/2.59.2/192725fef51e88473b849f7d2b2243674a5c5641/dagger-spi-2.59.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/33.6.0-jre/c376b13067cc99a5774403530953f7b05a91e218/guava-33.6.0-jre.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.dagger/dagger/2.59.2/2055356a898b7e4bdd24d15640185241e7cffb9a/dagger-2.59.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.49.0/8b42a2e3865f6e0576da3fad51dbb96732ff0f14/error_prone_annotations-2.49.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/7.0.2/c2b43c946b86a14a96342379e22b004c56c6166d/HikariCP-7.0.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-dbutils/commons-dbutils/1.8.1/a79885894c6338a70d88cf1641ba48bcbd00ca80/commons-dbutils-1.8.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/github.benslabbert.vdw.codegen/platform/4.76.0/1f67a2a518f1ec36f658ac54b7a1361d6ab848c8/platform-4.76.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-json-schema/5.1.0/4a15de38080808dbdfe363f1538d15e3b9977e2f/vertx-json-schema-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-pg-client/5.1.0/8851e0338b668229a146a5f8d8e2d66074c4eded/vertx-pg-client-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-service-proxy/5.1.0/e5cdd7aedb3577c9c7905cbe1049124ec3abc3ad/vertx-service-proxy-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-web/5.1.0/f9ca968656b084ba0cf2feb6ee40a2bc412c3ba6/vertx-web-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-sql-client-codec/5.1.0/ec0ff08c84e8304c8113874bba73fe5b24b2afe0/vertx-sql-client-codec-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-sql-client/5.1.0/92f450d4ddcdfef540f2014d8a75a31b469cc692/vertx-sql-client-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-web-common/5.1.0/514c023524d6a6859386b5cd41b0f29cd93813db/vertx-web-common-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-auth-common/5.1.0/f0e79383fbf9478792b5451c8989cb5514fe531/vertx-auth-common-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-bridge-common/5.1.0/9db0256ae3b64445e70cc003ba7e116d5ecb0a88/vertx-bridge-common-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-eventbus-bridge-common/5.1.0/c6c4d586c233880bf5df8ee70d029ae34c7df643/vertx-eventbus-bridge-common-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-core/5.1.0/54a5ef35cec3d3d8c2430ac8f4aa6e874aa3dc5f/vertx-core-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.20.0/65897b3e5731220962e659e001904af3c3cbeba9/commons-lang3-3.20.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.glassfish.expressly/expressly/6.0.0/524fa43fa48fc68fb62604cf14ce71b31caf7c0/expressly-6.0.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hibernate.validator/hibernate-validator/9.1.0.Final/53505ad984428ab42b4a4f3456aab9ec343bf2f2/hibernate-validator-9.1.0.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jooq/jooq/3.21.4/2bedf854f1b8316be1c45ff66dad1b42ee671669/jooq-3.21.4.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.18/78a9e7a37cd6360e0b818e86341b24123d28d4df/slf4j-api-2.0.18.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.devtools.ksp/symbol-processing-api/2.2.20-2.0.3/42747c9cc0f03f7ca5f03b0c14f64b1258a37410/symbol-processing-api-2.2.20-2.0.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.3/aeaffd00d57023a2c947393ed251f0354f0985fc/failureaccess-1.0.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/javapoet/1.13.0/d6562d385049f35eb50403fa86bb11cce76b866a/javapoet-1.13.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.11.0/5a16322632c6361f7058c948bab1aafa6e7a337f/kotlinpoet-1.11.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.ltgt.gradle.incap/incap/0.2/c73e3db9bee414d6ee27995d951fcdbee09acad/incap-0.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-compat-qual/2.5.3/45f92d2e0676d05ae9297269b8268f93a875d4a/checker-compat-qual-2.5.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-metadata-jvm/2.2.20/1f04dd6a9950a57b90ab8fa536337ba76dee4f59/kotlin-metadata-jvm-2.2.20.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.8.0/ed04f49e186a116753ad70d34f0ac2925d1d8020/kotlin-stdlib-jdk8-1.8.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.8.0/3c91271347f678c239607abb676d4032a7898427/kotlin-stdlib-jdk7-1.8.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.2.20/5380b19fa1924399b62ce3a1faffebb2b4f82272/kotlin-stdlib-2.2.20.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/b421526c5f297295adef1c886e5246c39d4ac629/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jspecify/jspecify/1.0.0/7425a601c1c7ec76645a78d22b8c6a627edee507/jspecify-1.0.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/3.1/a892ca9507839bbdb900d64310ac98256cab992f/j2objc-annotations-3.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.inject/jakarta.inject-api/2.0.1/4c28afe1991a941d7702fe1362c365f0a8641d1e/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-core-logging/5.1.0/26a95358c052b9e8af7a7c8706ab120792272a6c/vertx-core-logging-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler-proxy/4.2.14.Final/c48fd1a1593b3379249c2dfcb15156462f38d6c6/netty-handler-proxy-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-http2/4.2.14.Final/bf1a8bfb2d91da9d66926fa168e27391427d71b8/netty-codec-http2-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-http/4.2.14.Final/9677b714a48c544a56928c740fc475e7fe5f1fb7/netty-codec-http-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-classes-quic/4.2.14.Final/12f1d3572121132308226c6b09c08da59f88885b/netty-codec-classes-quic-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-resolver-dns/4.2.14.Final/6c3ffd55b36eee779467e8dd2aa3492cc7f90777/netty-resolver-dns-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.2.14.Final/9677e2bbbcc0fe1a32cef5aea7925f2ada7aeb34/netty-handler-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.2.14.Final/5f1012272f0d28a82eeefac48e5352777a559adf/netty-transport-native-unix-common-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-socks/4.2.14.Final/9e89b556cac1f0dc64e6f2543c47934881e7befc/netty-codec-socks-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-compression/4.2.14.Final/6b1af72f3899187a5e831c38f09eb66cb5f6a4d0/netty-codec-compression-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-dns/4.2.14.Final/d69744a5f2107a30389f398acea1c3a8361bbe37/netty-codec-dns-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-base/4.2.14.Final/2651ac5b0ebef9b5f0baa51e7c06b6f508d5b6f0/netty-codec-base-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport/4.2.14.Final/5b29e388af37da2e3f59f4633d4da0b21dd4f687/netty-transport-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-buffer/4.2.14.Final/b6c5212317867fbbe37fe0e511c7afddbf9ca0/netty-buffer-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-resolver/4.2.14.Final/f7c6a20a73085bb99ae56b2ff95804bfc89a0423/netty-resolver-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-common/4.2.14.Final/22c14466886c7c766cb59d69077e9cc309f355db/netty-common-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-http3/4.2.14.Final/5734906df0de91abe77024e7285ec40326713e8/netty-codec-http3-4.2.14.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.21.3/3358e9345dd0f2537c47bee152c0377df6c81ad5/jackson-core-2.21.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-tcnative-classes/2.0.77.Final/f58362f70036d0738e995347987b6462f3408204/netty-tcnative-classes-2.0.77.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ongres.scram/scram-client/3.2/2740c71dffca1b614ec64f8ad9c9327bd84b05a9/scram-client-3.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-codegen-json/5.1.0/29721083aa81cbfc120fcb2401a4f6d023fe12c4/vertx-codegen-json-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-codegen-processor/5.1.0/6a306360d06127c6f830f71742f1f58bc97993ec/vertx-codegen-processor-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-codegen-api/5.1.0/54649800eabfcf29215f282a1222e6bffbd32906/vertx-codegen-api-5.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.el/jakarta.el-api/6.0.1/c7c4a2eb1e40e0ff45ab5e2e52bd77d8c7a75176/jakarta.el-api-6.0.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.validation/jakarta.validation-api/3.1.1/ec8622148afc5564235d17af80ea80288d0e7f92/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jboss.logging/jboss-logging/3.6.1.Final/886afbb445b4016a37c8960a7aef6ebd769ce7e5/jboss-logging-3.6.1.Final.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml/classmate/1.7.1/e803194e4362a2c0585087c5f315682897d12f00/classmate-1.7.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.r2dbc/r2dbc-spi/1.0.0.RELEASE/e3d15b2d27fdb8fdb76a181b21d5c752adf1d165/r2dbc-spi-1.0.0.RELEASE.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ongres.scram/scram-common/3.2/8d975b8792f729b7657779868f651b19a946046c/scram-common-3.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ongres.stringprep/saslprep/2.2/1a0d29a48e83348cfdccdd598eb050cd083a60f8/saslprep-2.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ongres.stringprep/stringprep/2.2/623bbba4ba60b710f078ee9aa6d55c37b26b5b87/stringprep-2.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reactivestreams/reactive-streams/1.0.3/d9fb7a7926ffa635b3dcaa5049fb2bfa25b3e7d0/reactive-streams-1.0.3.jar" />
+        </processorPath>
+        <module name="backend.app.main" />
+      </profile>
+    </annotationProcessing>
     <bytecodeTargetLevel target="25" />
   </component>
 </project>
