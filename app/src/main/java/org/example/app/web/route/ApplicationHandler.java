@@ -148,22 +148,24 @@ class ApplicationHandler {
         userName,
         permission);
 
-    boolean hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select p.value from permission p
-            join application a on a.id = p.application_id
-            join "user" u on u.id = p.application_id
-            join user_role ur on ur.user_id = u.id
-            join "role" r on r.id = ur.role_id
-            join role_permission rp on rp.role_id = r.id
-            where a.name = ? and u.name = ? and rp.permission_id = p.id and p.value = ?
-            order by p.id
-            """,
-            ResultSet::next,
-            appName,
-            userName,
-            permission);
+    Boolean hasPermission =
+        jdbcUtils.doInTransaction(
+            _ ->
+                jdbcQueryRunner.query(
+                    """
+                    select p.value from permission p
+                    join application a on a.id = p.application_id
+                    join "user" u on u.id = p.application_id
+                    join user_role ur on ur.user_id = u.id
+                    join "role" r on r.id = ur.role_id
+                    join role_permission rp on rp.role_id = r.id
+                    where a.name = ? and u.name = ? and rp.permission_id = p.id and p.value = ?
+                    order by p.id
+                    """,
+                    ResultSet::next,
+                    appName,
+                    userName,
+                    permission));
 
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }

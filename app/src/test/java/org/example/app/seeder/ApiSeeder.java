@@ -55,6 +55,24 @@ public class ApiSeeder {
         .map(r -> GetPermissionsResponseJson.fromJson(r.bodyAsJsonObject()));
   }
 
+  public Future<GetPermissionsResponse> getApplicationUserPermissions(
+      String application, String user) {
+    return wc.get("/application/permissions/" + application + "/" + user)
+        .authentication(ADMIN_AUTH)
+        .send()
+        .expecting(r -> 200 == r.statusCode())
+        .map(r -> GetPermissionsResponseJson.fromJson(r.bodyAsJsonObject()));
+  }
+
+  public Future<HasPermissionResponse> hasPermission(
+      String application, String user, String permission) {
+    return wc.get("/application/permissions/" + application + "/" + user + "/" + permission)
+        .authentication(ADMIN_AUTH)
+        .send()
+        .expecting(r -> 200 == r.statusCode())
+        .map(r -> HasPermissionResponseJson.fromJson(r.bodyAsJsonObject()));
+  }
+
   public Future<Void> createRole(Consumer<CreateRoleRequestBuilder.Builder> c) {
     CreateRoleRequestBuilder.Builder builder = CreateRoleRequestBuilder.builder();
     c.accept(builder);
