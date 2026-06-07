@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2026. */
-package org.example.app.integration;
+package org.example.app;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -12,28 +12,37 @@ import github.benslabbert.vdw.codegen.config.ApplicationConfig_PostgresConfigBui
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
+import io.vertx.ext.auth.authentication.Credentials;
+import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import java.util.concurrent.TimeUnit;
-import org.example.app.di.Provider;
 import org.example.app.verticle.DefaultVerticle;
 import org.example.utilities.FlywayUtility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
 @ExtendWith(VertxExtension.class)
 public abstract class PostgresTestBase {
 
+  private static final Logger log = LoggerFactory.getLogger(PostgresTestBase.class);
+
   public static final PostgreSQLContainer POSTGRES = DockerContainers.POSTGRES;
+  public static final Credentials ADMIN_AUTH =
+      new UsernamePasswordCredentials("name", "password").applyHttpChallenge(null);
 
   static {
+    log.info("starting postgres...");
     POSTGRES.start();
+    log.info("starting postgres...done");
   }
 
   private volatile DefaultVerticle verticle;
@@ -82,10 +91,6 @@ public abstract class PostgresTestBase {
 
   protected int getPort() {
     return verticle.getPort();
-  }
-
-  protected Provider getProvider() {
-    return verticle.getProvider();
   }
 
   protected WebClient getWebClient(Vertx vertx) {

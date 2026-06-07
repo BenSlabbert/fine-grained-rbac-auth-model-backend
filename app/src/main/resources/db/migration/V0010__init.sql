@@ -58,12 +58,8 @@ CREATE
       id BIGINT NOT NULL PRIMARY KEY,
       version int4 NOT NULL,
       application_id BIGINT NOT NULL,
-      value VARCHAR(255) NOT NULL,
-      CONSTRAINT fk_permission_application FOREIGN KEY(application_id) REFERENCES application(id),
-      CONSTRAINT uq_permission_application_id_value UNIQUE(
-        application_id,
-        value
-      )
+      value VARCHAR(255) NOT NULL UNIQUE,
+      CONSTRAINT fk_permission_application FOREIGN KEY(application_id) REFERENCES application(id)
     );
 
 CREATE

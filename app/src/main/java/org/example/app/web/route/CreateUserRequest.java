@@ -7,4 +7,4 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonWriter
 @GenerateBuilder
-public record CreateApplicationRequest(@NotBlank String name) {}
+public record CreateUserRequest(@NotBlank String name) {}

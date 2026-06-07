@@ -3,5 +3,5 @@
 Run the podman service
 
 ```shell
-podman system service --time=0 unix:///run/user/${id -u}/podman/podman.soc
+mkdir -p /run/user/$(id -u)/podman && podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock &
 ```

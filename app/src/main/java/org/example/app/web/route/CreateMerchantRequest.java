@@ -8,4 +8,4 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonWriter
 @GenerateBuilder
-record CreateMerchantRequest(@NotBlank String name, @Nullable Long pspId) {}
+public record CreateMerchantRequest(@NotBlank String name, @Nullable Long pspId) {}

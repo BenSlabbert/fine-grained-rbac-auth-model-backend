@@ -6,4 +6,4 @@ import github.benslabbert.vdw.codegen.annotation.json.JsonWriter;
 
 @JsonWriter
 @GenerateBuilder
-record CreateMerchantGroupMerchantRequest(long merchantGroupId, long merchantId) {}
+public record CreateMerchantGroupMerchantRequest(long merchantGroupId, long merchantId) {}

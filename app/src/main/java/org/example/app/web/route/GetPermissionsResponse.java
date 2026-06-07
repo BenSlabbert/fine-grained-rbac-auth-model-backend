@@ -3,8 +3,8 @@ package org.example.app.web.route;
 
 import github.benslabbert.vdw.codegen.annotation.builder.GenerateBuilder;
 import github.benslabbert.vdw.codegen.annotation.json.JsonWriter;
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 @JsonWriter
 @GenerateBuilder
-public record CreateApplicationRequest(@NotBlank String name) {}
+public record GetPermissionsResponse(List<String> permissions) {}

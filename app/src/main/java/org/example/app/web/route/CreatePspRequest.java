@@ -7,4 +7,4 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonWriter
 @GenerateBuilder
-record CreatePspRequest(@NotBlank String name) {}
+public record CreatePspRequest(@NotBlank String name) {}

@@ -11,6 +11,6 @@ import java.util.Set;
 
 @JsonWriter
 @GenerateBuilder
-public record AddPermissionsRequest(
-    @NotBlank String applicationName,
-    @NotNull @NotEmpty @Size(min = 1, max = 100) Set<String> permissions) {}
+public record AssignRolePermissionsRequest(
+    @NotBlank String roleName,
+    @NotNull @NotEmpty @Size(min = 1, max = 100) Set<String> permissionValues) {}
