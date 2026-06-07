@@ -121,11 +121,11 @@ class ApplicationHandler {
             """
             select p.value from permission p
             join application a on a.id = p.application_id
-            join "user" u on u.id = p.application_id
-            join user_role ur on ur.user_id = u.id
-            join "role" r on r.id = ur.role_id
-            join role_permission rp on rp.role_id = r.id
-            where a.name = ? and u.name = ? and rp.permission_id = p.id
+            join role_permission rp on rp.permission_id = p.id
+            join "role" r on r.id = rp.role_id
+            join user_role ur on ur.role_id = r.id
+            join "user" u on u.id = ur.user_id
+            where a.name = ? and u.name = ?
             order by p.id
             """,
             rs -> rs.getString(1),
@@ -155,11 +155,11 @@ class ApplicationHandler {
                     """
                     select p.value from permission p
                     join application a on a.id = p.application_id
-                    join "user" u on u.id = p.application_id
-                    join user_role ur on ur.user_id = u.id
-                    join "role" r on r.id = ur.role_id
-                    join role_permission rp on rp.role_id = r.id
-                    where a.name = ? and u.name = ? and rp.permission_id = p.id and p.value = ?
+                    join role_permission rp on rp.permission_id = p.id
+                    join "role" r on r.id = rp.role_id
+                    join user_role ur on ur.role_id = r.id
+                    join "user" u on u.id = ur.user_id
+                    where a.name = ? and u.name = ? and p.value = ?
                     order by p.id
                     """,
                     ResultSet::next,
