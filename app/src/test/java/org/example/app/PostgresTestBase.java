@@ -22,7 +22,9 @@ import io.vertx.junit5.VertxTestContext;
 import java.util.concurrent.TimeUnit;
 import org.example.app.verticle.DefaultVerticle;
 import org.example.utilities.FlywayUtility;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -39,10 +41,18 @@ public abstract class PostgresTestBase {
   public static final Credentials ADMIN_AUTH =
       new UsernamePasswordCredentials("name", "password").applyHttpChallenge(null);
 
-  static {
+  @BeforeAll
+  static void start() {
     log.info("starting postgres...");
     POSTGRES.start();
     log.info("starting postgres...done");
+  }
+
+  @AfterAll
+  static void stop() {
+    log.info("stopping postgres...");
+    POSTGRES.stop();
+    log.info("stopping postgres...done");
   }
 
   private volatile DefaultVerticle verticle;
