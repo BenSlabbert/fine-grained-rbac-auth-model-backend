@@ -16,6 +16,11 @@ jobs:
     permissions:
       contents: "read"
     steps:
+    - name: "Install Podman"
+      uses: "redhat-actions/podman-install@main"
+    - name: "Set DOCKER_HOST to rootless Podman socket"
+      run: "echo \"DOCKER_HOST=unix:///run/$(id -u)/podman/podman.sock\" >> $GITHUB_ENV"
+    - run: "echo \"$DOCKER_HOST\""
     - name: "Checkout code"
       uses: "actions/checkout@v6"
     - name: "Set up Java 25"
@@ -23,6 +28,7 @@ jobs:
       with:
         java-version: "25"
         distribution: "graalvm"
+    - run: "podman version"
     - name: "Setup Gradle"
       uses: "gradle/actions/setup-gradle@v6"
     - name: "Build without tests"
