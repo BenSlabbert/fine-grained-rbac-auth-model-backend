@@ -1,5 +1,5 @@
 {
-  "name": "try-floci",
+  "name": "fine-grained-rbac-auth-model-backend",
   "image": "mcr.microsoft.com/devcontainers/java:1-25-bookworm",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
