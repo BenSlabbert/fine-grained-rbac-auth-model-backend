@@ -8,6 +8,8 @@ name: "Build"
 jobs:
   build:
     runs-on: "ubuntu-latest"
+    env:
+      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
     permissions:
       contents: "read"
       security-events: "write"

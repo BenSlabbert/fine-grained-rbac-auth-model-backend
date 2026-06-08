@@ -11,6 +11,8 @@ name: "Copilot Setup Steps"
 jobs:
   copilot-setup-steps:
     runs-on: "ubuntu-latest"
+    env:
+      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
     permissions:
       contents: "read"
     steps:
