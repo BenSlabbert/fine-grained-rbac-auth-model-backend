@@ -25,4 +25,3 @@ jobs:
       env:
         QODANA_TOKEN: "${{ secrets.QODANA_TOKEN_930696827 }}"
         QODANA_ENDPOINT: "https://qodana.cloud"
-        GH_TOKEN: "${{ secrets.GH_TOKEN }}"
