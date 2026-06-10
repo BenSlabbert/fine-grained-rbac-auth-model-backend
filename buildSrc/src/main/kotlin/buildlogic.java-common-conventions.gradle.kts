@@ -27,9 +27,6 @@ val uid =
             .trim()
     }.getOrDefault("1000")
 
-val parallelForks =
-    ((Runtime.getRuntime().availableProcessors() / 2).coerceAtMost(4)).coerceAtLeast(1)
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -49,7 +46,7 @@ tasks.withType<Test>().configureEach {
     minHeapSize = "64m"
     maxHeapSize = "128m"
     jvmArgs("--enable-native-access=ALL-UNNAMED")
-    maxParallelForks = parallelForks
+    maxParallelForks = 1
     environment("DOCKER_HOST", "unix:///run/user/$uid/podman/podman.sock")
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
 }
