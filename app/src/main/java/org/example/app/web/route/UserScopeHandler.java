@@ -11,6 +11,7 @@ import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Post;
 import github.benslabbert.vdw.codegen.commons.jdbc.JdbcUtils;
 import github.benslabbert.vdw.codegen.commons.jdbc.JdbcUtilsFactory;
 import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
+import io.vertx.core.VertxException;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,10 @@ class UserScopeHandler {
                 request.pspNames().toArray())
             .collect(Collectors.toMap(s -> s.name, s -> Reference.of(s.id)));
 
+    if (map.size() != request.pspNames().size()) {
+      throw VertxException.noStackTrace("could not find all pspNames");
+    }
+
     List<UserPspScope> list =
         request.pspNames().stream()
             .map(r -> UserPspScopeBuilder.builder().user(user).psp(map.get(r)).build())
@@ -101,6 +106,10 @@ class UserScopeHandler {
                 request.merchantNames().toArray())
             .collect(Collectors.toMap(s -> s.name, s -> Reference.of(s.id)));
 
+    if (map.size() != request.merchantNames().size()) {
+      throw VertxException.noStackTrace("could not find all merchantNames");
+    }
+
     List<UserMerchantScope> list =
         request.merchantNames().stream()
             .map(r -> UserMerchantScopeBuilder.builder().user(user).merchant(map.get(r)).build())
@@ -130,6 +139,10 @@ class UserScopeHandler {
                 r -> new RS(r.getLong(1), r.getString(2)),
                 request.merchantGroupNames().toArray())
             .collect(Collectors.toMap(s -> s.name, s -> Reference.of(s.id)));
+
+    if (map.size() != request.merchantGroupNames().size()) {
+      throw VertxException.noStackTrace("could not find all merchantGroupNames");
+    }
 
     List<UserMerchantGroupScope> list =
         request.merchantGroupNames().stream()
@@ -169,6 +182,10 @@ class UserScopeHandler {
                 r -> new RS(r.getLong(1), r.getString(2)),
                 request.customMerchantGroupNames().toArray())
             .collect(Collectors.toMap(s -> s.name, s -> Reference.of(s.id)));
+
+    if (map.size() != request.customMerchantGroupNames().size()) {
+      throw VertxException.noStackTrace("could not find all customMerchantGroupNames");
+    }
 
     List<UserCustomMerchantGroupScope> list =
         request.customMerchantGroupNames().stream()
