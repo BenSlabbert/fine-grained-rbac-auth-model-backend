@@ -22,12 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.dbutils.StatementConfiguration;
-import org.example.app.entity.Application;
-import org.example.app.entity.ApplicationBuilder;
-import org.example.app.entity.ApplicationRepository;
-import org.example.app.entity.Permission;
-import org.example.app.entity.PermissionBuilder;
-import org.example.app.entity.PermissionRepository;
+import org.example.app.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +31,8 @@ class ApplicationHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ApplicationHandler.class);
 
+  private final UserRepository userRepository;
+  private final MerchantRepository merchantRepository;
   private final ApplicationRepository applicationRepository;
   private final PermissionRepository permissionRepository;
   private final JdbcQueryRunner jdbcQueryRunner;
@@ -45,11 +42,15 @@ class ApplicationHandler {
   ApplicationHandler(
       JdbcQueryRunnerFactory jdbcQueryRunnerFactory,
       JdbcUtilsFactory jdbcUtilsFactory,
+      UserRepository userRepository,
+      MerchantRepository merchantRepository,
       ApplicationRepository applicationRepository,
       PermissionRepository permissionRepository) {
     var cfg = new StatementConfiguration.Builder().fetchSize(10).build();
-    this.jdbcUtils = jdbcUtilsFactory.create(cfg);
     this.jdbcQueryRunner = jdbcQueryRunnerFactory.create(cfg);
+    this.userRepository = userRepository;
+    this.merchantRepository = merchantRepository;
+    this.jdbcUtils = jdbcUtilsFactory.create(cfg);
     this.applicationRepository = applicationRepository;
     this.permissionRepository = permissionRepository;
   }
@@ -173,18 +174,119 @@ class ApplicationHandler {
   @Get(path = "/permissions/{string:userName}/{string:pspName}")
   @HasRole("admin")
   HasPermissionResponse userHasPspScope(@PathParams Map<String, String> pathParams) {
-    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+    var params = ApplicationHandler_UserHasPspScope_ParamParser.parse(pathParams);
+    var userName = params.userName();
+    var pspName = params.pspName();
+
+    boolean hasPermission =
+        jdbcUtils.doInTransaction(
+            _ ->
+                jdbcQueryRunner.query(
+                    """
+                    select 1 from user_psp_scope ups
+                    join "user" u on u.id = ups.user_id
+                    join psp_scope ps on ps.id = ups.psp_scope_id
+                    where u.name = ? and ps.name = ?
+                    """,
+                    ResultSet::next,
+                    userName,
+                    pspName));
+
+    return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
+  @Transactional
   @Get(path = "/permissions/{string:userName}/{string:merchantName}")
   @HasRole("admin")
   HasPermissionResponse userHasMerchantScope(@PathParams Map<String, String> pathParams) {
-    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+    var params = ApplicationHandler_UserHasMerchantScope_ParamParser.parse(pathParams);
+    var userName = params.userName();
+    var merchantName = params.merchantName();
+
+    long userId = userRepository.name(userName).orElseThrow().id();
+    long merchantId = merchantRepository.name(merchantName).orElseThrow().id();
+
+    boolean hasPermission =
+        jdbcQueryRunner.query(
+            """
+            select 1 from user_merchant_scope
+            where user_id = ? and merchant_id = ?
+            """,
+            ResultSet::next,
+            userId,
+            merchantId);
+
+    if (hasPermission) {
+      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
+    }
+
+    hasPermission =
+        jdbcQueryRunner.query(
+            """
+            select 1 from user_merchant_group_scope s
+            join merchant_group mg on s.merchant_group_id = mg.id
+            join merchant_merchant_group mmg on mmg.merchant_group_id = mg.id
+            where s.user_id = ? and mmg.merchant_id = ?
+            """,
+            ResultSet::next,
+            userId,
+            merchantId);
+
+    if (hasPermission) {
+      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
+    }
+
+    hasPermission =
+        jdbcQueryRunner.query(
+            """
+            select 1 from user_psp_scope s
+            join merchant_psp mp on s.psp_id = mp.psp_id
+            where s.user_id = ? and mp.merchant_id = ?
+            """,
+            ResultSet::next,
+            userId,
+            merchantId);
+
+    if (hasPermission) {
+      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
+    }
+
+    hasPermission =
+        jdbcQueryRunner.query(
+            """
+            select 1 from user_custom_merchant_group_scope s
+            join custom_merchant_group cmg on s.custom_merchant_group_id = cmg.id
+            join custom_merchant_group_merchant cmgm on cmgm.custom_merchant_group_id = cmg.id
+            where s.user_id = ? and cmgm.merchant_id = ?
+            """,
+            ResultSet::next,
+            userId,
+            merchantId);
+
+    return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
   @Get(path = "/permissions/{string:userName}/{string:merchantGroupName}")
   @HasRole("admin")
   HasPermissionResponse userHasMerchantGroupScope(@PathParams Map<String, String> pathParams) {
-    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+    var params = ApplicationHandler_UserHasMerchantGroupScope_ParamParser.parse(pathParams);
+    var userName = params.userName();
+    var merchantGroupName = params.merchantGroupName();
+
+    boolean hasPermission =
+        jdbcUtils.doInTransaction(
+            _ ->
+                jdbcQueryRunner.query(
+                    """
+                    select 1 from user_merchant_group_scope umgs
+                    join "user" u on u.id = umgs.user_id
+                    join merchant_group mg on mg.id = umgs.merchant_group_id
+                    where u.name = ? and mg.name = ?
+                    """,
+                    ResultSet::next,
+                    userName,
+                    merchantGroupName));
+
+    return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 }
