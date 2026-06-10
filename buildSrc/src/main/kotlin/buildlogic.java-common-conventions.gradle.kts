@@ -49,4 +49,5 @@ tasks.withType<Test>().configureEach {
     maxParallelForks = 1
     environment("DOCKER_HOST", "unix:///run/user/$uid/podman/podman.sock")
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
+    environment("TESTCONTAINERS_HOST_OVERRIDE", "127.0.0.1")
 }
