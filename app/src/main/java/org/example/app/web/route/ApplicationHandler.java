@@ -169,4 +169,22 @@ class ApplicationHandler {
 
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
+
+  @Get(path = "/permissions/{string:userName}/{string:pspName}")
+  @HasRole("admin")
+  HasPermissionResponse userHasPspScope(@PathParams Map<String, String> pathParams) {
+    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+  }
+
+  @Get(path = "/permissions/{string:userName}/{string:merchantName}")
+  @HasRole("admin")
+  HasPermissionResponse userHasMerchantScope(@PathParams Map<String, String> pathParams) {
+    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+  }
+
+  @Get(path = "/permissions/{string:userName}/{string:merchantGroupName}")
+  @HasRole("admin")
+  HasPermissionResponse userHasMerchantGroupScope(@PathParams Map<String, String> pathParams) {
+    return HasPermissionResponseBuilder.builder().hasPermission(false).build();
+  }
 }
