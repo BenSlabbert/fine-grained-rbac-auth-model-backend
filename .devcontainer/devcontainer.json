@@ -1,25 +1,23 @@
 {
   "name": "fine-grained-rbac-auth-model-backend",
-  "image": "mcr.microsoft.com/devcontainers/java:1-25-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "runArgs": [
+    "--privileged",
+    "--device=/dev/fuse"
+  ],
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/sshd:1": {},
-    "ghcr.io/devcontainers/features/gradle:1": {
-      "version": "9.5.1"
-    }
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "25"
+    },
+    "ghcr.io/devcontainers/features/sshd:1": {}
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "vscjava.vscode-java-pack",
-        "vscjava.vscode-gradle",
-        "redhat.java",
-        "ms-azuretools.vscode-docker"
-      ],
+      "extensions": [],
       "settings": {
         "java.jdt.ls.java.home": "/usr/local/sdkman/candidates/java/current"
       }
     }
   },
-  "postCreateCommand": "chmod +x gradlew && ./gradlew --version"
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y podman uidmap slirp4netns fuse-overlayfs && chmod +x gradlew && ./gradlew --version && podman --version"
 }

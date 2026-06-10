@@ -8,10 +8,14 @@ name: "Build"
 jobs:
   build:
     runs-on: "ubuntu-latest"
+    env:
+      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
     permissions:
       contents: "read"
       security-events: "write"
     steps:
+    - name: "Install Podman"
+      uses: "redhat-actions/podman-install@main"
     - uses: "actions/checkout@v6"
     - name: "Initialize CodeQL"
       uses: "github/codeql-action/init@v4"
@@ -22,6 +26,7 @@ jobs:
       with:
         java-version: "25"
         distribution: "graalvm"
+    - run: "podman version"
     - name: "Setup Gradle"
       uses: "gradle/actions/setup-gradle@v6"
     - name: "Build"

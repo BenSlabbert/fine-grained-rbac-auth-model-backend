@@ -10,6 +10,13 @@ val localEnv =
         }
     }
 
+val gprUser = providers.provider { localEnv.getProperty("gpr.user") }.orElse("BenSlabbert")
+
+val gprKey =
+    providers
+        .environmentVariable("GH_TOKEN")
+        .orElse(providers.provider { localEnv.getProperty("gpr.key") })
+
 val uid =
     runCatching {
         providers
@@ -25,8 +32,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/BenSlabbert/vertx-dagger-web-codegen")
         credentials {
-            username = localEnv.getProperty("gpr.user")
-            password = localEnv.getProperty("gpr.key")
+            username = gprUser.get()
+            password = gprKey.get()
         }
     }
 }
