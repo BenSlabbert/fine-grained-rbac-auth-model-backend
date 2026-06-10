@@ -16,9 +16,6 @@ jobs:
     steps:
     - name: "Install Podman"
       uses: "redhat-actions/podman-install@main"
-    - name: "Set DOCKER_HOST to rootless Podman socket"
-      run: "echo \"DOCKER_HOST=unix:///run/$(id -u)/podman/podman.sock\" >> $GITHUB_ENV"
-    - run: "echo \"$DOCKER_HOST\""
     - uses: "actions/checkout@v6"
     - name: "Initialize CodeQL"
       uses: "github/codeql-action/init@v4"
