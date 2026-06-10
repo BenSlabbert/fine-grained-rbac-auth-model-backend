@@ -5,8 +5,7 @@ name: "Qodana"
   pull_request: null
   push:
     branches:
-    - "main"
-    - "releases/*"
+    - "master"
 jobs:
   qodana:
     runs-on: "ubuntu-latest"
