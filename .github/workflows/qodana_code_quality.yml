@@ -9,6 +9,8 @@ name: "Qodana"
 jobs:
   qodana:
     runs-on: "ubuntu-latest"
+    env:
+      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
     permissions:
       contents: "write"
       pull-requests: "write"
