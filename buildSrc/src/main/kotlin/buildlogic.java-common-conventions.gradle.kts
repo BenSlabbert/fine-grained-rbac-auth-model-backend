@@ -16,6 +16,7 @@ val gprKey =
     providers
         .environmentVariable("GH_TOKEN")
         .orElse(providers.provider { localEnv.getProperty("gpr.key") })
+        .orElse("")
 
 val uid =
     runCatching {
