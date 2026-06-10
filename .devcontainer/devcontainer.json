@@ -2,6 +2,7 @@
   "name": "fine-grained-rbac-auth-model-backend",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "runArgs": [
+    "--privileged",
     "--device=/dev/fuse"
   ],
   "features": {

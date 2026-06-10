@@ -1,174 +1,174 @@
-CREATE
-  SEQUENCE id_sequence
-START WITH
-  1 INCREMENT BY 1 MAXVALUE 9223372036854775807 CACHE 1;
+create
+  sequence id_sequence
+start with
+  1 increment by 1 maxvalue 9223372036854775807 CACHE 1;
 
-CREATE
-  TABLE
+create
+  table
     psp(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     merchant(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE,
-      psp_id BIGINT,
-      merchant_group_id BIGINT,
-      CONSTRAINT fk_merchant_psp FOREIGN KEY(psp_id) REFERENCES psp(id),
-      CONSTRAINT fk_merchant_group_psp FOREIGN KEY(merchant_group_id) REFERENCES merchant_group(id),
-      CONSTRAINT ck_psp_or_merchant_group CHECK(
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique,
+      psp_id bigint,
+      merchant_group_id bigint,
+      constraint fk_merchant_psp foreign key(psp_id) references psp(id),
+      constraint fk_merchant_group_psp foreign key(merchant_group_id) references merchant_group(id),
+      constraint ck_psp_or_merchant_group check(
         (
-          psp_id IS NOT NULL
-          AND merchant_group_id IS NULL
+          psp_id is not null
+          and merchant_group_id is null
         )
-        OR(
-          psp_id IS NULL
-          AND merchant_group_id IS NOT NULL
+        or(
+          psp_id is null
+          and merchant_group_id is not null
         )
-        OR(
-          psp_id IS NULL
-          AND merchant_group_id IS NULL
+        or(
+          psp_id is null
+          and merchant_group_id is null
         )
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     merchant_group(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     application(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     permission(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      application_id BIGINT NOT NULL,
-      value VARCHAR(255) NOT NULL UNIQUE,
-      CONSTRAINT fk_permission_application FOREIGN KEY(application_id) REFERENCES application(id)
+      id bigint not null primary key,
+      version int4 not null,
+      application_id bigint not null,
+      value varchar(255) not null unique,
+      constraint fk_permission_application foreign key(application_id) references application(id)
     );
 
-CREATE
-  TABLE
+create
+  table
     "user"(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     "role"(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     role_permission(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      role_id BIGINT NOT NULL,
-      permission_id BIGINT NOT NULL,
-      CONSTRAINT fk_role_permission_role FOREIGN KEY(role_id) REFERENCES "role"(id),
-      CONSTRAINT fk_role_permission_permission FOREIGN KEY(permission_id) REFERENCES permission(id),
-      CONSTRAINT uq_role_permission UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      role_id bigint not null,
+      permission_id bigint not null,
+      constraint fk_role_permission_role foreign key(role_id) references "role"(id),
+      constraint fk_role_permission_permission foreign key(permission_id) references permission(id),
+      constraint uq_role_permission unique(
         role_id,
         permission_id
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     user_role(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      user_id BIGINT NOT NULL,
-      role_id BIGINT NOT NULL,
-      CONSTRAINT fk_user_role_user FOREIGN KEY(user_id) REFERENCES "user"(id),
-      CONSTRAINT fk_user_role_role FOREIGN KEY(role_id) REFERENCES "role"(id),
-      CONSTRAINT uq_user_role UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      user_id bigint not null,
+      role_id bigint not null,
+      constraint fk_user_role_user foreign key(user_id) references "user"(id),
+      constraint fk_user_role_role foreign key(role_id) references "role"(id),
+      constraint uq_user_role unique(
         user_id,
         role_id
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     custom_merchant_group(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      name VARCHAR(255) NOT NULL UNIQUE
+      id bigint not null primary key,
+      version int4 not null,
+      name varchar(255) not null unique
     );
 
-CREATE
-  TABLE
+create
+  table
     custom_merchant_group_merchant(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      custom_merchant_group_id BIGINT NOT NULL,
-      merchant_id BIGINT NOT NULL,
-      CONSTRAINT fk_custom_merchant_group_merchant_custom_merchant_group_id FOREIGN KEY(custom_merchant_group_id) REFERENCES custom_merchant_group(id),
-      CONSTRAINT fk_custom_merchant_group_merchant_merchant_id FOREIGN KEY(merchant_id) REFERENCES merchant(id),
-      CONSTRAINT uq_custom_merchant_group_merchant UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      custom_merchant_group_id bigint not null,
+      merchant_id bigint not null,
+      constraint fk_custom_merchant_group_merchant_custom_merchant_group_id foreign key(custom_merchant_group_id) references custom_merchant_group(id),
+      constraint fk_custom_merchant_group_merchant_merchant_id foreign key(merchant_id) references merchant(id),
+      constraint uq_custom_merchant_group_merchant unique(
         custom_merchant_group_id,
         merchant_id
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     user_psp_scope(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      user_id BIGINT NOT NULL,
-      psp_id BIGINT NOT NULL,
-      CONSTRAINT fk_user_psp_scope_psp_id FOREIGN KEY(psp_id) REFERENCES psp(id),
-      CONSTRAINT uq_user_role UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      user_id bigint not null,
+      psp_id bigint not null,
+      constraint fk_user_psp_scope_psp_id foreign key(psp_id) references psp(id),
+      constraint uq_user_role unique(
         user_id,
         psp_id
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     user_merchant_group_scope(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      user_id BIGINT NOT NULL,
-      merchant_group_id BIGINT NOT NULL,
-      CONSTRAINT fk_user_merchant_group_scope_merchant_group_id FOREIGN KEY(merchant_group_id) REFERENCES merchant_group(id),
-      CONSTRAINT uq_user_role UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      user_id bigint not null,
+      merchant_group_id bigint not null,
+      constraint fk_user_merchant_group_scope_merchant_group_id foreign key(merchant_group_id) references merchant_group(id),
+      constraint uq_user_role unique(
         user_id,
         merchant_group_id
       )
     );
 
-CREATE
-  TABLE
+create
+  table
     user_merchant_scope(
-      id BIGINT NOT NULL PRIMARY KEY,
-      version int4 NOT NULL,
-      user_id BIGINT NOT NULL,
-      merchant_id BIGINT NOT NULL,
-      CONSTRAINT fk_user_merchant_scope_merchant_id FOREIGN KEY(merchant_id) REFERENCES merchant(id),
-      CONSTRAINT uq_user_role UNIQUE(
+      id bigint not null primary key,
+      version int4 not null,
+      user_id bigint not null,
+      merchant_id bigint not null,
+      constraint fk_user_merchant_scope_merchant_id foreign key(merchant_id) references merchant(id),
+      constraint uq_user_role unique(
         user_id,
         merchant_id
       )
