@@ -12,8 +12,10 @@ public class Main extends VertxApplication {
 
   public static void main(String[] args) {
     log.info("Starting");
+    long start = System.currentTimeMillis();
     int code = new Main(args).launch();
-    log.info("launch successful ? {}", 0 == code);
+    long time = System.currentTimeMillis() - start;
+    log.info("launch successful ? {} time {}ms", 0 == code, time);
   }
 
   private Main(String[] args) {

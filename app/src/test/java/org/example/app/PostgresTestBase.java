@@ -88,6 +88,7 @@ public abstract class PostgresTestBase {
             .build();
 
     verticle = new DefaultVerticle();
+    long start = System.currentTimeMillis();
     v.deployVerticle(
             verticle,
             new DeploymentOptions()
@@ -96,6 +97,11 @@ public abstract class PostgresTestBase {
                 .setHa(false)
                 .setInstances(1)
                 .setWorkerPoolSize(1))
+        .andThen(
+            _ -> {
+              long time = System.currentTimeMillis() - start;
+              log.info("deploy time {}ms", time);
+            })
         .onComplete(tc.succeedingThenComplete());
   }
 

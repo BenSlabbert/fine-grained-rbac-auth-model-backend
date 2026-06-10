@@ -7,4 +7,4 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonWriter
 @GenerateBuilder
-public record CreateMerchantRequest(@NotBlank String name) {}
+public record CreateCustomMerchantGroup(@NotBlank String name) {}

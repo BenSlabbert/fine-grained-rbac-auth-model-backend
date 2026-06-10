@@ -9,10 +9,10 @@ import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Id;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Version;
 import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 
-@Table("merchant")
+@Table("custom_merchant_group")
 @GenerateBuilder
-public record Merchant(
+public record CustomMerchantGroup(
     @Column("id") @Id("id_sequence") long id,
     @Column("version") @Version int version,
     @Column("name") @FindOneByColumn String name)
-    implements Reference<Merchant> {}
+    implements Reference<CustomMerchantGroup> {}

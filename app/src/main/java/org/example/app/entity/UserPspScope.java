@@ -4,15 +4,15 @@ package org.example.app.entity;
 import github.benslabbert.vdw.codegen.annotation.builder.GenerateBuilder;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Column;
-import github.benslabbert.vdw.codegen.annotation.jdbc.Table.FindOneByColumn;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Id;
 import github.benslabbert.vdw.codegen.annotation.jdbc.Table.Version;
 import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 
-@Table("merchant")
+@Table("user_psp_scope")
 @GenerateBuilder
-public record Merchant(
+public record UserPspScope(
     @Column("id") @Id("id_sequence") long id,
     @Column("version") @Version int version,
-    @Column("name") @FindOneByColumn String name)
-    implements Reference<Merchant> {}
+    @Column("user_id") Reference<User> user,
+    @Column("psp_id") Reference<Psp> psp)
+    implements Reference<UserPspScope> {}
