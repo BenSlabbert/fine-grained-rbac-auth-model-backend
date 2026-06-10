@@ -8,40 +8,64 @@ create
     psp(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index psp_name_idx on
+  psp(name) include(id);
 
 create
   table
     merchant_group(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index merchant_group_name_idx on
+  merchant_group(name) include(id);
 
 create
   table
     merchant(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique,
-      psp_id bigint,
-      merchant_group_id bigint,
-      constraint fk_merchant_psp foreign key(psp_id) references psp(id),
-      constraint fk_merchant_group_psp foreign key(merchant_group_id) references merchant_group(id),
-      constraint ck_psp_or_merchant_group check(
-        (
-          psp_id is not null
-          and merchant_group_id is null
-        )
-        or(
-          psp_id is null
-          and merchant_group_id is not null
-        )
-        or(
-          psp_id is null
-          and merchant_group_id is null
-        )
+      name varchar(255) not null
+    );
+
+create
+  unique index merchant_name_idx on
+  merchant(name) include(id);
+
+create
+  table
+    merchant_psp(
+      id bigint not null primary key,
+      version int4 not null,
+      merchant_id bigint not null,
+      psp_id bigint not null,
+      constraint fk_merchant_psp_merchant_id foreign key(merchant_id) references merchant(id),
+      constraint fk_merchant_psp_psp_id foreign key(psp_id) references psp,
+      constraint uq_merchant_psp unique(
+        merchant_id,
+        psp_id
+      )
+    );
+
+create
+  table
+    merchant_merchant_group(
+      id bigint not null primary key,
+      version int4 not null,
+      merchant_id bigint not null,
+      merchant_group_id bigint not null,
+      constraint fk_merchant_merchant_group_merchant_id foreign key(merchant_id) references merchant(id),
+      constraint fk_merchant_merchant_group_merchant_group_id foreign key(merchant_group_id) references merchant_group,
+      constraint uq_merchant_merchant_group unique(
+        merchant_id,
+        merchant_group_id
       )
     );
 
@@ -50,8 +74,12 @@ create
     application(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index application_name_idx on
+  application(name) include(id);
 
 create
   table
@@ -68,16 +96,24 @@ create
     "user"(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index user_name_idx on
+  "user"(name) include(id);
 
 create
   table
     "role"(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index role_name_idx on
+  "role"(name) include(id);
 
 create
   table
@@ -114,8 +150,12 @@ create
     custom_merchant_group(
       id bigint not null primary key,
       version int4 not null,
-      name varchar(255) not null unique
+      name varchar(255) not null
     );
+
+create
+  unique index custom_merchant_group_name_idx on
+  custom_merchant_group(name) include(id);
 
 create
   table
@@ -139,6 +179,7 @@ create
       version int4 not null,
       user_id bigint not null,
       psp_id bigint not null,
+      constraint fk_user_psp_scope_user_id foreign key(user_id) references "user"(id),
       constraint fk_user_psp_scope_psp_id foreign key(psp_id) references psp(id),
       constraint uq_user_psp_scope unique(
         user_id,
@@ -153,6 +194,7 @@ create
       version int4 not null,
       user_id bigint not null,
       merchant_group_id bigint not null,
+      constraint fk_user_merchant_group_scope_merchant_user_id foreign key(user_id) references "user"(id),
       constraint fk_user_merchant_group_scope_merchant_group_id foreign key(merchant_group_id) references merchant_group(id),
       constraint uq_user_merchant_group_scope unique(
         user_id,
@@ -167,9 +209,25 @@ create
       version int4 not null,
       user_id bigint not null,
       merchant_id bigint not null,
+      constraint fk_user_merchant_scope_user_id foreign key(user_id) references "user"(id),
       constraint fk_user_merchant_scope_merchant_id foreign key(merchant_id) references merchant(id),
       constraint uq_user_merchant_scope unique(
         user_id,
         merchant_id
+      )
+    );
+
+create
+  table
+    user_custom_merchant_group_scope(
+      id bigint not null primary key,
+      version int4 not null,
+      user_id bigint not null,
+      custom_merchant_group_id bigint not null,
+      constraint fk_user_custom_merchant_group_scope_user_id foreign key(user_id) references "user"(id),
+      constraint fk_user_custom_merchant_group_scope_custom_merchant_group_id foreign key(custom_merchant_group_id) references custom_merchant_group(id),
+      constraint uq_user_custom_merchant_group_scope unique(
+        user_id,
+        custom_merchant_group_id
       )
     );

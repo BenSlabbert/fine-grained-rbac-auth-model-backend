@@ -4,7 +4,10 @@ package org.example.app.web.route;
 import github.benslabbert.vdw.codegen.annotation.builder.GenerateBuilder;
 import github.benslabbert.vdw.codegen.annotation.json.JsonWriter;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.util.Set;
 
 @JsonWriter
 @GenerateBuilder
-public record CreateMerchantRequest(@NotBlank String name) {}
+public record AddMerchantToMerchantGroupRequest(
+    @NotBlank String merchantGroupName, @NotNull Set<String> merchantNames) {}
