@@ -1,13 +1,13 @@
 {
   "name": "fine-grained-rbac-auth-model-backend",
-  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "image": "mcr.microsoft.com/devcontainers/base:trixie",
   "runArgs": [
     "--privileged",
     "--device=/dev/fuse"
   ],
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
-      "version": "25"
+      "version": "25.0.3-graal"
     },
     "ghcr.io/devcontainers/features/sshd:1": {}
   },
@@ -19,5 +19,5 @@
       }
     }
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y podman uidmap slirp4netns fuse-overlayfs && chmod +x gradlew && ./gradlew --version && podman --version"
+  "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y podman uidmap slirp4netns fuse-overlayfs && chmod +x gradlew && ./gradlew build -x test --console=plain && podman --version"
 }
