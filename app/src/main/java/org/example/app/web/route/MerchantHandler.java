@@ -26,12 +26,16 @@ class MerchantHandler {
 
   private final CustomMerchantGroupMerchantRepository customMerchantGroupMerchantRepository;
   private final CustomMerchantGroupRepository customMerchantGroupRepository;
+  private final MerchantPspRepository merchantPspRepository;
+  private final PspRepository pspRepository;
   private final MerchantRepository merchantRepository;
   private final JdbcUtils jdbcUtils;
 
   @Inject
   MerchantHandler(
       JdbcUtilsFactory jdbcUtilsFactory,
+      MerchantPspRepository merchantPspRepository,
+      PspRepository pspRepository,
       CustomMerchantGroupMerchantRepository customMerchantGroupMerchantRepository,
       CustomMerchantGroupRepository customMerchantGroupRepository,
       MerchantRepository merchantRepository) {
@@ -39,6 +43,8 @@ class MerchantHandler {
     this.jdbcUtils = jdbcUtilsFactory.create(cfg);
     this.customMerchantGroupMerchantRepository = customMerchantGroupMerchantRepository;
     this.customMerchantGroupRepository = customMerchantGroupRepository;
+    this.merchantPspRepository = merchantPspRepository;
+    this.pspRepository = pspRepository;
     this.merchantRepository = merchantRepository;
   }
 
@@ -97,5 +103,17 @@ class MerchantHandler {
             .toList();
 
     customMerchantGroupMerchantRepository.insertAll(list);
+  }
+
+  @Transactional
+  @Post(path = "/psp")
+  @HasRole("admin")
+  void addMerchantToPsp(@Body AddMerchantToPspRequest request) {
+    log.info("add merchant {} to psp {}", request.merchantName(), request.pspName());
+
+    var merchant = merchantRepository.name(request.merchantName()).orElseThrow();
+    var psp = pspRepository.name(request.pspName()).orElseThrow();
+
+    merchantPspRepository.save(MerchantPspBuilder.builder().merchant(merchant).psp(psp).build());
   }
 }
