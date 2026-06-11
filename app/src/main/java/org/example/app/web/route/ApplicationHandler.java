@@ -20,7 +20,6 @@ import jakarta.inject.Inject;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.commons.dbutils.StatementConfiguration;
 import org.example.app.entity.*;
 import org.slf4j.Logger;
@@ -31,11 +30,12 @@ class ApplicationHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ApplicationHandler.class);
 
-  private final UserRepository userRepository;
-  private final MerchantRepository merchantRepository;
   private final ApplicationRepository applicationRepository;
   private final PermissionRepository permissionRepository;
+  private final MerchantRepository merchantRepository;
   private final JdbcQueryRunner jdbcQueryRunner;
+  private final UserRepository userRepository;
+  private final PspRepository pspRepository;
   private final JdbcUtils jdbcUtils;
 
   @Inject
@@ -43,12 +43,14 @@ class ApplicationHandler {
       JdbcQueryRunnerFactory jdbcQueryRunnerFactory,
       JdbcUtilsFactory jdbcUtilsFactory,
       UserRepository userRepository,
+      PspRepository pspRepository,
       MerchantRepository merchantRepository,
       ApplicationRepository applicationRepository,
       PermissionRepository permissionRepository) {
     var cfg = new StatementConfiguration.Builder().fetchSize(10).build();
     this.jdbcQueryRunner = jdbcQueryRunnerFactory.create(cfg);
     this.userRepository = userRepository;
+    this.pspRepository = pspRepository;
     this.merchantRepository = merchantRepository;
     this.jdbcUtils = jdbcUtilsFactory.create(cfg);
     this.applicationRepository = applicationRepository;
@@ -70,13 +72,8 @@ class ApplicationHandler {
     log.info(
         "add permissions {} to application {}", request.permissions(), request.applicationName());
 
-    Optional<Application> maybeApplication = applicationRepository.name(request.applicationName());
-    if (maybeApplication.isEmpty()) {
-      response.setStatusCode(404).end();
-      return;
-    }
-
-    Reference<Application> ref = Reference.of(maybeApplication.get().id());
+    Reference<Application> ref =
+        applicationRepository.name(request.applicationName()).orElseThrow();
 
     List<Permission> permissions =
         request.permissions().stream()
@@ -171,32 +168,32 @@ class ApplicationHandler {
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
-  @Get(path = "/permissions/{string:userName}/{string:pspName}")
+  @Transactional
+  @Get(path = "/scope/psp/{string:userName}/{string:pspName}")
   @HasRole("admin")
   HasPermissionResponse userHasPspScope(@PathParams Map<String, String> pathParams) {
     var params = ApplicationHandler_UserHasPspScope_ParamParser.parse(pathParams);
     var userName = params.userName();
     var pspName = params.pspName();
 
+    long userId = userRepository.name(userName).orElseThrow().id();
+    long pspId = pspRepository.name(pspName).orElseThrow().id();
+
     boolean hasPermission =
-        jdbcUtils.doInTransaction(
-            _ ->
-                jdbcQueryRunner.query(
-                    """
-                    select 1 from user_psp_scope ups
-                    join "user" u on u.id = ups.user_id
-                    join psp_scope ps on ps.id = ups.psp_scope_id
-                    where u.name = ? and ps.name = ?
-                    """,
-                    ResultSet::next,
-                    userName,
-                    pspName));
+        jdbcQueryRunner.query(
+            """
+            select 1 from user_psp_scope
+            where user_id = ? and psp_id = ?
+            """,
+            ResultSet::next,
+            userId,
+            pspId);
 
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
   @Transactional
-  @Get(path = "/permissions/{string:userName}/{string:merchantName}")
+  @Get(path = "/scope/merchant/{string:userName}/{string:merchantName}")
   @HasRole("admin")
   HasPermissionResponse userHasMerchantScope(@PathParams Map<String, String> pathParams) {
     var params = ApplicationHandler_UserHasMerchantScope_ParamParser.parse(pathParams);
@@ -266,7 +263,7 @@ class ApplicationHandler {
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
-  @Get(path = "/permissions/{string:userName}/{string:merchantGroupName}")
+  @Get(path = "/scope/merchant-group/{string:userName}/{string:merchantGroupName}")
   @HasRole("admin")
   HasPermissionResponse userHasMerchantGroupScope(@PathParams Map<String, String> pathParams) {
     var params = ApplicationHandler_UserHasMerchantGroupScope_ParamParser.parse(pathParams);

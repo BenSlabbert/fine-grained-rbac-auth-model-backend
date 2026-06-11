@@ -140,6 +140,17 @@ public class ApiSeeder {
         .map(ApiSeeder::voidFunction);
   }
 
+  public Future<Void> addMerchantToPsp(Consumer<AddMerchantToPspRequestBuilder.Builder> c) {
+    var builder = AddMerchantToPspRequestBuilder.builder();
+    c.accept(builder);
+    var payload = builder.build();
+    return wc.post("/merchant/psp")
+        .authentication(ADMIN_AUTH)
+        .sendJsonObject(AddMerchantToPspRequestJson.toJson(payload))
+        .expecting(r -> 200 == r.statusCode())
+        .map(ApiSeeder::voidFunction);
+  }
+
   public Future<Void> createCustomMerchantGroup(
       Consumer<CreateCustomMerchantGroupBuilder.Builder> c) {
     CreateCustomMerchantGroupBuilder.Builder builder = CreateCustomMerchantGroupBuilder.builder();
@@ -232,5 +243,30 @@ public class ApiSeeder {
         .sendJsonObject(AddUserToCustomMerchantGroupScopeRequestJson.toJson(payload))
         .expecting(r -> 200 == r.statusCode())
         .map(ApiSeeder::voidFunction);
+  }
+
+  public Future<HasPermissionResponse> userHasPspScope(String user, String psp) {
+    return wc.get("/application/scope/psp/%s/%s".formatted(user, psp))
+        .authentication(ADMIN_AUTH)
+        .send()
+        .expecting(r -> 200 == r.statusCode())
+        .map(r -> HasPermissionResponseJson.fromJson(r.bodyAsJsonObject()));
+  }
+
+  public Future<HasPermissionResponse> userHasMerchantScope(String user, String merchant) {
+    return wc.get("/application/scope/merchant/%s/%s".formatted(user, merchant))
+        .authentication(ADMIN_AUTH)
+        .send()
+        .expecting(r -> 200 == r.statusCode())
+        .map(r -> HasPermissionResponseJson.fromJson(r.bodyAsJsonObject()));
+  }
+
+  public Future<HasPermissionResponse> userHasMerchantGroupScope(
+      String user, String merchantGroup) {
+    return wc.get("/application/scope/merchant-group/%s/%s".formatted(user, merchantGroup))
+        .authentication(ADMIN_AUTH)
+        .send()
+        .expecting(r -> 200 == r.statusCode())
+        .map(r -> HasPermissionResponseJson.fromJson(r.bodyAsJsonObject()));
   }
 }
