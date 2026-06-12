@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.vdw.annotation)
     implementation(libs.vdw.platform)
     implementation(project(":utilities"))
+    implementation(project(":security-api"))
     compileOnly(libs.google.auto.annotations)
 
     runtimeOnly(libs.postgresql)
