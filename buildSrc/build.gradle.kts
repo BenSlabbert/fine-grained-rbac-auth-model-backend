@@ -13,6 +13,7 @@ repositories {
 spotless {
     kotlinGradle {
         target("*.gradle.kts", "src/**/*.gradle.kts")
+        targetExclude("**/build/**")
         ktfmt().googleStyle()
         ktlint()
     }

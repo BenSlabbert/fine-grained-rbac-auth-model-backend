@@ -5,4 +5,4 @@ plugins {
 
 rootProject.name = "backend"
 
-include("iam", "list", "utilities")
+include("iam", "list", "utilities", "security-api")

@@ -17,11 +17,11 @@ import github.benslabbert.vdw.codegen.commons.jdbc.JdbcUtilsFactory;
 import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.dbutils.StatementConfiguration;
 import org.example.iam.entity.*;
+import org.example.iam.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,29 +32,23 @@ class ApplicationHandler {
 
   private final ApplicationRepository applicationRepository;
   private final PermissionRepository permissionRepository;
-  private final MerchantRepository merchantRepository;
   private final JdbcQueryRunner jdbcQueryRunner;
-  private final UserRepository userRepository;
-  private final PspRepository pspRepository;
   private final JdbcUtils jdbcUtils;
+  private final AuthService authService;
 
   @Inject
   ApplicationHandler(
+      AuthService authService,
       JdbcQueryRunnerFactory jdbcQueryRunnerFactory,
       JdbcUtilsFactory jdbcUtilsFactory,
-      UserRepository userRepository,
-      PspRepository pspRepository,
-      MerchantRepository merchantRepository,
       ApplicationRepository applicationRepository,
       PermissionRepository permissionRepository) {
     var cfg = new StatementConfiguration.Builder().fetchSize(10).build();
     this.jdbcQueryRunner = jdbcQueryRunnerFactory.create(cfg);
-    this.userRepository = userRepository;
-    this.pspRepository = pspRepository;
-    this.merchantRepository = merchantRepository;
     this.jdbcUtils = jdbcUtilsFactory.create(cfg);
     this.applicationRepository = applicationRepository;
     this.permissionRepository = permissionRepository;
+    this.authService = authService;
   }
 
   @Put(responseCode = 201)
@@ -113,24 +107,8 @@ class ApplicationHandler {
     var appName = params.appName();
     var userName = params.userName();
     log.info("get permissions for application {} and userId {}", appName, userName);
-
-    try (var s =
-        jdbcUtils.streamInTransaction(
-            """
-            select p.value from permission p
-            join application a on a.id = p.application_id
-            join role_permission rp on rp.permission_id = p.id
-            join "role" r on r.id = rp.role_id
-            join user_role ur on ur.role_id = r.id
-            join "user" u on u.id = ur.user_id
-            where a.name = ? and u.name = ?
-            order by p.id
-            """,
-            rs -> rs.getString(1),
-            appName,
-            userName)) {
-      return new GetPermissionsResponse(s.toList());
-    }
+    var permissions = authService.getApplicationUserPermissions(appName, userName);
+    return new GetPermissionsResponse(permissions);
   }
 
   @Get(path = "/permissions/{string:appName}/{string:userName}/{string:permission}")
@@ -146,120 +124,27 @@ class ApplicationHandler {
         userName,
         permission);
 
-    Boolean hasPermission =
-        jdbcUtils.doInTransaction(
-            _ ->
-                jdbcQueryRunner.query(
-                    """
-                    select p.value from permission p
-                    join application a on a.id = p.application_id
-                    join role_permission rp on rp.permission_id = p.id
-                    join "role" r on r.id = rp.role_id
-                    join user_role ur on ur.role_id = r.id
-                    join "user" u on u.id = ur.user_id
-                    where a.name = ? and u.name = ? and p.value = ?
-                    order by p.id
-                    """,
-                    ResultSet::next,
-                    appName,
-                    userName,
-                    permission));
-
+    var hasPermission = authService.hasPermission(appName, userName, permission);
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
-  @Transactional
   @Get(path = "/scope/psp/{string:userName}/{string:pspName}")
   @HasRole("admin")
   HasPermissionResponse userHasPspScope(@PathParams Map<String, String> pathParams) {
     var params = ApplicationHandler_UserHasPspScope_ParamParser.parse(pathParams);
     var userName = params.userName();
     var pspName = params.pspName();
-
-    long userId = userRepository.name(userName).orElseThrow().id();
-    long pspId = pspRepository.name(pspName).orElseThrow().id();
-
-    boolean hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select 1 from user_psp_scope
-            where user_id = ? and psp_id = ?
-            """,
-            ResultSet::next,
-            userId,
-            pspId);
-
+    boolean hasPermission = authService.userHasPspScope(userName, pspName);
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
-  @Transactional
   @Get(path = "/scope/merchant/{string:userName}/{string:merchantName}")
   @HasRole("admin")
   HasPermissionResponse userHasMerchantScope(@PathParams Map<String, String> pathParams) {
     var params = ApplicationHandler_UserHasMerchantScope_ParamParser.parse(pathParams);
     var userName = params.userName();
     var merchantName = params.merchantName();
-
-    long userId = userRepository.name(userName).orElseThrow().id();
-    long merchantId = merchantRepository.name(merchantName).orElseThrow().id();
-
-    boolean hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select 1 from user_merchant_scope
-            where user_id = ? and merchant_id = ?
-            """,
-            ResultSet::next,
-            userId,
-            merchantId);
-
-    if (hasPermission) {
-      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
-    }
-
-    hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select 1 from user_merchant_group_scope s
-            join merchant_group mg on s.merchant_group_id = mg.id
-            join merchant_merchant_group mmg on mmg.merchant_group_id = mg.id
-            where s.user_id = ? and mmg.merchant_id = ?
-            """,
-            ResultSet::next,
-            userId,
-            merchantId);
-
-    if (hasPermission) {
-      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
-    }
-
-    hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select 1 from user_psp_scope s
-            join merchant_psp mp on s.psp_id = mp.psp_id
-            where s.user_id = ? and mp.merchant_id = ?
-            """,
-            ResultSet::next,
-            userId,
-            merchantId);
-
-    if (hasPermission) {
-      return HasPermissionResponseBuilder.builder().hasPermission(true).build();
-    }
-
-    hasPermission =
-        jdbcQueryRunner.query(
-            """
-            select 1 from user_custom_merchant_group_scope s
-            join custom_merchant_group cmg on s.custom_merchant_group_id = cmg.id
-            join custom_merchant_group_merchant cmgm on cmgm.custom_merchant_group_id = cmg.id
-            where s.user_id = ? and cmgm.merchant_id = ?
-            """,
-            ResultSet::next,
-            userId,
-            merchantId);
-
+    boolean hasPermission = authService.userHasMerchantScope(userName, merchantName);
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 
@@ -269,21 +154,7 @@ class ApplicationHandler {
     var params = ApplicationHandler_UserHasMerchantGroupScope_ParamParser.parse(pathParams);
     var userName = params.userName();
     var merchantGroupName = params.merchantGroupName();
-
-    boolean hasPermission =
-        jdbcUtils.doInTransaction(
-            _ ->
-                jdbcQueryRunner.query(
-                    """
-                    select 1 from user_merchant_group_scope umgs
-                    join "user" u on u.id = umgs.user_id
-                    join merchant_group mg on mg.id = umgs.merchant_group_id
-                    where u.name = ? and mg.name = ?
-                    """,
-                    ResultSet::next,
-                    userName,
-                    merchantGroupName));
-
+    boolean hasPermission = authService.userHasMerchantGroupScope(userName, merchantGroupName);
     return HasPermissionResponseBuilder.builder().hasPermission(hasPermission).build();
   }
 }

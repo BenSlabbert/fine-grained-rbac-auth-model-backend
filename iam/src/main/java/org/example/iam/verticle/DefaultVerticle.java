@@ -1,11 +1,13 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.iam.verticle;
 
+import github.benslabbert.vdw.codegen.commons.eb.EventBusServiceConfigurer;
 import github.benslabbert.vdw.codegen.config.ApplicationConfig;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
+import io.vertx.serviceproxy.ProxyHandler;
 import java.util.Objects;
 import org.example.iam.di.DaggerProvider;
 import org.example.iam.di.Provider;
@@ -46,6 +48,7 @@ public class DefaultVerticle extends AbstractVerticle {
             .config(config())
             .build();
     provider.init();
+    provider.eventBusServiceConfigurers().forEach(EventBusServiceConfigurer::configure);
 
     ServerFactory serverFactory = provider.serverFactory();
     RouterFactory routerFactory = provider.routerFactory();
@@ -69,6 +72,9 @@ public class DefaultVerticle extends AbstractVerticle {
   @Override
   public void stop(Promise<Void> stopPromise) {
     log.info("Stopping verticle");
+
+    log.info("Stopping ProxyHandlers");
+    provider.proxyHandlers().forEach(ProxyHandler::close);
 
     if (null == httpServer) {
       stopPromise.complete();
