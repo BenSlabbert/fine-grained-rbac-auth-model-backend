@@ -9,7 +9,11 @@
     "ghcr.io/devcontainers/features/java:1": {
       "version": "25.0.3-graal"
     },
-    "ghcr.io/devcontainers/features/sshd:1": {}
+    "ghcr.io/devcontainers/features/sshd:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true
+    }
   },
   "customizations": {
     "vscode": {
