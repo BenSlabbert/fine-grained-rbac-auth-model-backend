@@ -46,7 +46,7 @@ tasks.withType<Test>().configureEach {
     minHeapSize = "64m"
     maxHeapSize = "128m"
     jvmArgs("--enable-native-access=ALL-UNNAMED")
-    maxParallelForks = 1
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 4).coerceIn(1, 4)
     environment("DOCKER_HOST", "unix:///run/user/$uid/podman/podman.sock")
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
     environment("TESTCONTAINERS_HOST_OVERRIDE", "127.0.0.1")
