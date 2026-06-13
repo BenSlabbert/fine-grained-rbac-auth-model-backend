@@ -47,6 +47,7 @@ public final class FlywayUtility {
         .validateMigrationNaming(true)
         .validateOnMigrate(true)
         .failOnMissingLocations(true)
-        .group(false);
+        .group(false)
+        .locations("db/migration");
   }
 }

@@ -7,6 +7,6 @@ services:
     environment:
       POSTGRES_USER: "username"
       POSTGRES_PASSWORD: "password"
-      DATABASES_TO_CREATE: "iam,another_db,payments"
+      DATABASES_TO_CREATE: "iam,transactions"
     volumes:
     - "./postgres-init:/docker-entrypoint-initdb.d"
