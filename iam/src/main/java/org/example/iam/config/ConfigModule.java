@@ -8,8 +8,6 @@ import github.benslabbert.vdw.codegen.commons.jdbc.JdbcTransactionManagerModule;
     includes = {
       // internal modules
       ConfigModuleBindings.class,
-      SessionHandlerProvider.class,
-      SessionStoreProvider.class,
       DataSourceProvider.class,
       // external modules
       JdbcTransactionManagerModule.class
