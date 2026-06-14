@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.gateway.web.route;
 
-import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
+import github.benslabbert.vdw.codegen.annotation.auth.NoAuthCheck;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Get;
@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NoAuthCheck
 @WebHandler(path = "/ping")
 class Ping {
 
@@ -22,7 +23,6 @@ class Ping {
   Ping() {}
 
   @Get
-  @HasRole("admin")
   void ping(@WebRequest.RoutingContext RoutingContext ctx) {
     // the user is here, it is added by
     User user = ctx.user();

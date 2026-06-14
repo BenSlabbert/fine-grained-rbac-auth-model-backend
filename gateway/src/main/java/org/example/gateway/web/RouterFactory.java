@@ -3,9 +3,7 @@ package org.example.gateway.web;
 
 import github.benslabbert.vdw.codegen.commons.RouterConfigurer;
 import io.vertx.core.Vertx;
-import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BasicAuthHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.LoggerFormat;
@@ -21,18 +19,13 @@ import java.util.Set;
 @Singleton
 public class RouterFactory {
 
-  private final AuthenticationProvider authenticationProvider;
   private final Set<RouterConfigurer> routerConfigurers;
   private final SessionHandler sessionHandler;
   private final Vertx vertx;
 
   @Inject
   RouterFactory(
-      AuthenticationProvider authenticationProvider,
-      Set<RouterConfigurer> routerConfigurers,
-      SessionHandler sessionHandler,
-      Vertx vertx) {
-    this.authenticationProvider = authenticationProvider;
+      Set<RouterConfigurer> routerConfigurers, SessionHandler sessionHandler, Vertx vertx) {
     this.routerConfigurers = routerConfigurers;
     this.sessionHandler = sessionHandler;
     this.vertx = vertx;
@@ -48,11 +41,7 @@ public class RouterFactory {
         .handler(ResponseTimeHandler.create())
         .handler(sessionHandler)
         .handler(CorsHandler.create())
-        .handler(BodyHandler.create().setBodyLimit(1024L * 100L))
-        // this is applied to all handlers/routes
-        // we should only use this for authenticated routes and not for the /login route
-        // (unauthenticated routes)
-        .handler(BasicAuthHandler.create(authenticationProvider));
+        .handler(BodyHandler.create().setBodyLimit(1024L * 100L));
 
     routerConfigurers.forEach(rc -> rc.route(router));
     return router;
