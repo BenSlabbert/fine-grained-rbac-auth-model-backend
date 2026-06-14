@@ -1,18 +1,30 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.iam.web.route;
 
-import static java.util.Collections.*;
+import static java.util.Collections.nCopies;
 
 import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
 import github.benslabbert.vdw.codegen.annotation.transaction.Transactional;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Body;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Post;
-import github.benslabbert.vdw.codegen.commons.jdbc.*;
+import github.benslabbert.vdw.codegen.commons.jdbc.JdbcUtils;
+import github.benslabbert.vdw.codegen.commons.jdbc.JdbcUtilsFactory;
+import github.benslabbert.vdw.codegen.commons.jdbc.Reference;
 import jakarta.inject.Inject;
 import java.util.List;
 import org.apache.commons.dbutils.StatementConfiguration;
-import org.example.iam.entity.*;
+import org.example.iam.entity.Role;
+import org.example.iam.entity.RoleBuilder;
+import org.example.iam.entity.RolePermission;
+import org.example.iam.entity.RolePermissionBuilder;
+import org.example.iam.entity.RolePermissionRepository;
+import org.example.iam.entity.RoleRepository;
+import org.example.iam.entity.User;
+import org.example.iam.entity.UserRepository;
+import org.example.iam.entity.UserRole;
+import org.example.iam.entity.UserRoleBuilder;
+import org.example.iam.entity.UserRoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

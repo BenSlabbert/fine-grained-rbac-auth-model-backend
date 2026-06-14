@@ -7,7 +7,9 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.junit5.VertxTestContext;
 import org.example.iam.PostgresTestBase;
-import org.example.security.api.*;
+import org.example.security.api.HasPermissionRequestBuilder;
+import org.example.security.api.SecurityService;
+import org.example.security.api.SecurityServiceVertxEBClientProxy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -89,6 +89,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ongres.stringprep/stringprep/2.2/623bbba4ba60b710f078ee9aa6d55c37b26b5b87/stringprep-2.2.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reactivestreams/reactive-streams/1.0.3/d9fb7a7926ffa635b3dcaa5049fb2bfa25b3e7d0/reactive-streams-1.0.3.jar" />
         </processorPath>
+        <module name="backend.gateway.main" />
         <module name="backend.iam.main" />
         <module name="backend.transactions.main" />
       </profile>
