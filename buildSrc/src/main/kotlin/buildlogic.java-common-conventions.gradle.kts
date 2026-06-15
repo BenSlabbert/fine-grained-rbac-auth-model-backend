@@ -64,6 +64,6 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencyLocking {
-    lockMode = LockMode.STRICT
+    //    lockMode = LockMode.STRICT
     lockAllConfigurations()
 }

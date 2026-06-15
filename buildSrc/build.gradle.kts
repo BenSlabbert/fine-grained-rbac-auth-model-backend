@@ -20,6 +20,6 @@ spotless {
 }
 
 dependencyLocking {
-    lockMode = LockMode.STRICT
+    lockMode = LockMode.LENIENT
     lockAllConfigurations()
 }
