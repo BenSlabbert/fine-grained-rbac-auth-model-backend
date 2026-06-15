@@ -94,6 +94,7 @@ io.rest-assured:rest-assured-common:6.0.0=testCompileClasspath,testRuntimeClassp
 io.rest-assured:rest-assured:6.0.0=testCompileClasspath,testRuntimeClasspath
 io.rest-assured:xml-path:6.0.0=testCompileClasspath,testRuntimeClasspath
 io.vertx:vertx-auth-common:5.1.2=annotationProcessor,compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.vertx:vertx-auth-jwt:5.1.2=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 io.vertx:vertx-bridge-common:5.1.2=annotationProcessor,compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 io.vertx:vertx-codegen-api:5.1.2=annotationProcessor,compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 io.vertx:vertx-codegen-json:5.1.2=annotationProcessor,compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
