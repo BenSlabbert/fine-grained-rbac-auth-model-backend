@@ -18,3 +18,8 @@ spotless {
         ktlint()
     }
 }
+
+dependencyLocking {
+    lockMode = LockMode.STRICT
+    lockAllConfigurations()
+}
