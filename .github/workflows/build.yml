@@ -29,6 +29,8 @@ jobs:
     - run: "podman version"
     - name: "Setup Gradle"
       uses: "gradle/actions/setup-gradle@v6.2.0"
+      with:
+        cache-provider: "basic"
     - name: "Build"
       run: "./gradlew clean build --console=plain --no-daemon"
     - name: "Perform CodeQL Analysis"
