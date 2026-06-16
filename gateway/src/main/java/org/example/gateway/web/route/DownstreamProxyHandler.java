@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.gateway.web.route;
 
+import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.All;
@@ -35,6 +36,7 @@ class DownstreamProxyHandler {
 
   private record Service(String host, int port) {}
 
+  @HasRole("admin")
   @All(path = "/{string:serviceName}/*")
   void all(@WebRequest.RoutingContext RoutingContext ctx) {
     var pathParams = DownstreamProxyHandler_All_ParamParser.parse(ctx.pathParams());
@@ -44,14 +46,13 @@ class DownstreamProxyHandler {
       ctx.response().setStatusCode(401).end();
       return;
     }
-    String uri = ctx.request().uri();
+    HttpServerRequest request = ctx.request();
     Service service = serviceMap.get(pathParams.serviceName());
     if (null == service) {
       ctx.response().setStatusCode(401).end();
       return;
     }
 
-    String path = uri.substring(uri.indexOf('/'));
     // find a downstream service for this context
     // generate a JWT token for this call
     // execute the call
@@ -83,19 +84,29 @@ class DownstreamProxyHandler {
                 // iam can view the token as well
                 .setAudience(Set.of(pathParams.serviceName(), "iam").stream().toList()));
 
+    // "/api/serviceName"
+    String uri = request.uri();
+    String path = uri.substring(("/api/" + pathParams.serviceName()).length());
+
     var requestOptions =
         new RequestOptions()
-            .setMethod(ctx.request().method())
+            .setMethod(request.method())
             .setHost(service.host)
             .setPort(service.port)
             .setURI(path)
-            .setHeaders(ctx.request().headers())
-            .addHeader("Bearer ", token);
+            //            .setHeaders(ctx.request().headers())
+            .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
+    request.pause();
 
     vertx
         .createHttpClient()
         .request(requestOptions)
-        .compose(r -> ctx.request().body().onFailure(VertxException::noStackTrace).compose(r::send))
+        .compose(
+            r -> {
+              request.resume();
+              return request.body().onFailure(VertxException::noStackTrace).compose(r::send);
+            })
         .onComplete(
             ar -> {
               if (ar.failed()) {
