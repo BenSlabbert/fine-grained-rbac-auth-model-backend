@@ -62,8 +62,3 @@ tasks.withType<Test>().configureEach {
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
     environment("TESTCONTAINERS_HOST_OVERRIDE", "127.0.0.1")
 }
-
-dependencyLocking {
-    //    lockMode = LockMode.STRICT
-    lockAllConfigurations()
-}

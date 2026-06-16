@@ -4,24 +4,28 @@ package org.example.gateway.web.route;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.Post;
-import io.vertx.ext.auth.authentication.AuthenticationProvider;
+import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.AuthenticationHandler;
-import io.vertx.ext.web.handler.BasicAuthHandler;
+import io.vertx.ext.web.Session;
+import io.vertx.ext.web.UserContext;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebHandler(path = "/login")
 class LoginHandler {
 
-  private final AuthenticationHandler authenticationHandler;
+  private static final Logger log = LoggerFactory.getLogger(LoginHandler.class);
 
   @Inject
-  LoginHandler(AuthenticationProvider authenticationProvider) {
-    this.authenticationHandler = BasicAuthHandler.create(authenticationProvider);
-  }
+  LoginHandler() {}
 
   @Post
   void login(@WebRequest.RoutingContext RoutingContext ctx) {
-    authenticationHandler.handle(ctx);
+    Session session = ctx.session();
+    User user = ctx.user();
+    UserContext userContext = ctx.userContext();
+    log.info("login");
+    ctx.end();
   }
 }

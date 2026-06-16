@@ -3,15 +3,10 @@ package org.example.gateway.web;
 
 import github.benslabbert.vdw.codegen.commons.RouterConfigurer;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.auth.authentication.AuthenticationProvider;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.CorsHandler;
-import io.vertx.ext.web.handler.LoggerFormat;
-import io.vertx.ext.web.handler.LoggerHandler;
-import io.vertx.ext.web.handler.ResponseContentTypeHandler;
-import io.vertx.ext.web.handler.ResponseTimeHandler;
-import io.vertx.ext.web.handler.SessionHandler;
-import io.vertx.ext.web.handler.TimeoutHandler;
+import io.vertx.ext.web.handler.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Set;
@@ -19,13 +14,18 @@ import java.util.Set;
 @Singleton
 public class RouterFactory {
 
+  private final AuthenticationProvider authenticationProvider;
   private final Set<RouterConfigurer> routerConfigurers;
   private final SessionHandler sessionHandler;
   private final Vertx vertx;
 
   @Inject
   RouterFactory(
-      Set<RouterConfigurer> routerConfigurers, SessionHandler sessionHandler, Vertx vertx) {
+      AuthenticationProvider authenticationProvider,
+      Set<RouterConfigurer> routerConfigurers,
+      SessionHandler sessionHandler,
+      Vertx vertx) {
+    this.authenticationProvider = authenticationProvider;
     this.routerConfigurers = routerConfigurers;
     this.sessionHandler = sessionHandler;
     this.vertx = vertx;
@@ -43,7 +43,15 @@ public class RouterFactory {
         .handler(CorsHandler.create())
         .handler(BodyHandler.create().setBodyLimit(1024L * 100L));
 
+    router
+        .route(HttpMethod.POST, "/login")
+        .handler(
+            ctx -> {
+              BasicAuthHandler.create(authenticationProvider).handle(ctx);
+            });
+
     routerConfigurers.forEach(rc -> rc.route(router));
+
     return router;
   }
 }
