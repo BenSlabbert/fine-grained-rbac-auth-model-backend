@@ -34,7 +34,10 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
     var r = Router.router(v);
     r.route(HttpMethod.GET, "/p1")
         .handler(
-            ctx -> ctx.response().putHeader("X-custom", "value").setStatusCode(200).end("body"));
+            ctx -> {
+              assertThat(ctx.request().getHeader("X-custom-req")).isEqualTo("req-header");
+              ctx.response().putHeader("X-custom", "value").setStatusCode(200).end("body");
+            });
     var s =
         v.createHttpServer(new HttpServerOptions().setPort(8082).setHost("0.0.0.0"))
             .requestHandler(r);
@@ -77,6 +80,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
     webClient
         .get("/api/transactions/p1")
         .putHeader(HttpHeaders.COOKIE, cookie.get())
+        .putHeader("X-custom-req", "req-header")
         .send()
         .onComplete(
             tc.succeeding(
@@ -85,6 +89,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
                         () -> {
                           assertThat(resp.statusCode()).isEqualTo(200);
                           assertThat(resp.bodyAsString()).isEqualTo("body");
+                          assertThat(resp.headers().get("X-custom")).isEqualTo("value");
                           tc.completeNow();
                         })));
   }

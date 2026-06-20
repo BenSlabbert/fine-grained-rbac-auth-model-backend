@@ -16,7 +16,6 @@ class PingIT extends IntegrationTestBase {
     WebClient wc = getWebClient(vertx);
 
     wc.get("/ping")
-        .authentication(ADMIN_AUTH)
         .send()
         .onComplete(
             tc.succeeding(
