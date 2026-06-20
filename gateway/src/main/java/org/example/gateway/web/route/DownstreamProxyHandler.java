@@ -11,7 +11,6 @@ import io.vertx.core.http.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
-import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.RoutingContext;
@@ -24,14 +23,24 @@ import java.util.UUID;
 class DownstreamProxyHandler {
 
   private final Map<String, Service> serviceMap;
-  private final Vertx vertx;
+  private final HttpClientAgent httpClient;
+  private final JWTAuth provider;
 
   @Inject
   DownstreamProxyHandler(Vertx vertx) {
     this.serviceMap =
         Map.of(
             "transactions", new Service("127.0.0.1", 8082), "iam", new Service("127.0.0.1", 8002));
-    this.vertx = vertx;
+    this.provider =
+        JWTAuth.create(
+            vertx,
+            new JWTAuthOptions()
+                .addPubSecKey(
+                    new PubSecKeyOptions()
+                        .setAlgorithm("HS256")
+                        .setId("simple")
+                        .setBuffer("keyboard cat")));
+    this.httpClient = vertx.createHttpClient();
   }
 
   private record Service(String host, int port) {}
@@ -40,12 +49,6 @@ class DownstreamProxyHandler {
   @All(path = "/{string:serviceName}/*")
   void all(@WebRequest.RoutingContext RoutingContext ctx) {
     var pathParams = DownstreamProxyHandler_All_ParamParser.parse(ctx.pathParams());
-    User user = ctx.user();
-    if (null == user) {
-      // not authenticated
-      ctx.response().setStatusCode(401).end();
-      return;
-    }
     HttpServerRequest request = ctx.request();
     Service service = serviceMap.get(pathParams.serviceName());
     if (null == service) {
@@ -57,50 +60,11 @@ class DownstreamProxyHandler {
     // generate a JWT token for this call
     // execute the call
     // send response back to the client
-    JWTAuth provider =
-        JWTAuth.create(
-            vertx,
-            new JWTAuthOptions()
-                .addPubSecKey(
-                    new PubSecKeyOptions()
-                        .setAlgorithm("HS256")
-                        .setId("simple")
-                        .setBuffer("keyboard cat")));
-
-    String token =
-        // https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims
-        provider.generateToken(
-            new JsonObject()
-                // JWT ID
-                .put("jti", UUID.randomUUID().toString())
-                // not before time
-                .put("nbf", System.currentTimeMillis()),
-            new JWTOptions()
-                .setIgnoreExpiration(false)
-                .setLeeway(100)
-                .setSubject(user.subject())
-                .setExpiresInSeconds(30)
-                .setIssuer("gateway")
-                // iam can view the token as well
-                .setAudience(Set.of(pathParams.serviceName(), "iam").stream().toList()));
-
-    // "/api/serviceName"
-    String uri = request.uri();
-    String path = uri.substring(("/api/" + pathParams.serviceName()).length());
-
-    var requestOptions =
-        new RequestOptions()
-            .setMethod(request.method())
-            .setHost(service.host)
-            .setPort(service.port)
-            .setURI(path)
-            //            .setHeaders(ctx.request().headers())
-            .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-
     request.pause();
+    var requestOptions =
+        getRequestOptions(ctx.user().subject(), pathParams.serviceName(), request, service);
 
-    vertx
-        .createHttpClient()
+    httpClient
         .request(requestOptions)
         .compose(
             r -> {
@@ -124,5 +88,36 @@ class DownstreamProxyHandler {
                     response.setStatusCode(result.statusCode()).end(body);
                   });
             });
+  }
+
+  private RequestOptions getRequestOptions(
+      String subject, String serviceName, HttpServerRequest request, Service service) {
+    String uri = request.uri();
+    String path = uri.substring(("/api/" + serviceName).length());
+    return new RequestOptions()
+        .setMethod(request.method())
+        .setHost(service.host)
+        .setPort(service.port)
+        .setURI(path)
+        .setHeaders(request.headers())
+        .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getToken(subject, serviceName));
+  }
+
+  private String getToken(String subject, String serviceName) {
+    // https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims
+    return provider.generateToken(
+        new JsonObject()
+            // JWT ID
+            .put("jti", UUID.randomUUID().toString())
+            // not before time
+            .put("nbf", System.currentTimeMillis()),
+        new JWTOptions()
+            .setIgnoreExpiration(false)
+            .setLeeway(100)
+            .setSubject(subject)
+            .setExpiresInSeconds(30)
+            .setIssuer("gateway")
+            // iam can view the token as well
+            .setAudience(Set.of(serviceName, "iam").stream().toList()));
   }
 }
