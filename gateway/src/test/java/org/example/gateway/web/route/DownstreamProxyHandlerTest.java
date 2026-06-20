@@ -10,8 +10,8 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import org.example.gateway.IntegrationTestBase;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +30,10 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
 
   @Test
   void test(Vertx v, VertxTestContext tc) throws InterruptedException {
-    CountDownLatch latch = new CountDownLatch(1);
+    Checkpoint downstreamServerCheckpoint = tc.checkpoint();
+    Checkpoint loginCheckpoint = tc.checkpoint();
+    Checkpoint testCompleteCheckpoint = tc.checkpoint();
+
     var r = Router.router(v);
     r.route(HttpMethod.GET, "/p1")
         .handler(
@@ -47,19 +50,14 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
         .onSuccess(
             ar -> {
               server = ar;
-              latch.countDown();
+              downstreamServerCheckpoint.flag();
             });
 
-    latch.await();
-    System.err.println("latch countdown complete");
+    downstreamServerCheckpoint.await();
 
-    // after server has started
-    // call gateway and assert downstreams are invoked
-    // ensure headers and body is passed through as well
     AtomicReference<String> cookie = new AtomicReference<>();
 
     WebClient webClient = getWebClient(v);
-    CountDownLatch latch2 = new CountDownLatch(1);
     webClient
         .post("/login")
         .authentication(ADMIN_AUTH)
@@ -72,10 +70,10 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
                           assertThat(resp.statusCode()).isEqualTo(200);
                           String header = resp.getHeader(HttpHeaders.SET_COOKIE);
                           cookie.set(header);
-                          latch2.countDown();
+                          loginCheckpoint.flag();
                         })));
 
-    latch2.await();
+    loginCheckpoint.await();
 
     webClient
         .get("/api/transactions/p1")
@@ -90,7 +88,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
                           assertThat(resp.statusCode()).isEqualTo(200);
                           assertThat(resp.bodyAsString()).isEqualTo("body");
                           assertThat(resp.headers().get("X-custom")).isEqualTo("value");
-                          tc.completeNow();
+                          testCompleteCheckpoint.flag();
                         })));
   }
 }
