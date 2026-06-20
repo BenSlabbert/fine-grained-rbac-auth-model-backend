@@ -58,11 +58,6 @@ class DownstreamProxyHandler {
       ctx.response().setStatusCode(401).end();
       return;
     }
-
-    // find a downstream service for this context
-    // generate a JWT token for this call
-    // execute the call
-    // send response back to the client
     request.pause();
     var requestOptions =
         getRequestOptions(ctx.user().subject(), pathParams.serviceName(), request, service);
