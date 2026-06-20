@@ -3,10 +3,13 @@ package org.example.gateway.verticle;
 
 import github.benslabbert.vdw.codegen.config.ApplicationConfig;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import java.util.Objects;
+import org.example.gateway.config.GatewayConfig;
 import org.example.gateway.di.DaggerProvider;
 import org.example.gateway.di.Provider;
 import org.example.gateway.web.RouterFactory;
@@ -20,9 +23,32 @@ public class DefaultVerticle extends AbstractVerticle {
 
   private volatile HttpServer httpServer = null;
   private volatile Provider provider = null;
+  private final GatewayConfig gatewayConfig;
 
-  private void setHttpServer(HttpServer httpServer) {
-    this.httpServer = httpServer;
+  // required for vert.x
+  public DefaultVerticle() {
+    this(null);
+  }
+
+  public DefaultVerticle(GatewayConfig gatewayConfig) {
+    this.gatewayConfig = gatewayConfig;
+  }
+
+  @Override
+  public void init(Vertx vertx, Context context) {
+    log.info("init verticle");
+    super.init(vertx, context);
+
+    provider =
+        DaggerProvider.builder()
+            .vertx(vertx)
+            .appConfig(ApplicationConfig.fromJson(config()))
+            .gatewayConfig(
+                null == gatewayConfig
+                    ? GatewayConfig.create(config().getJsonObject("gateway"))
+                    : gatewayConfig)
+            .config(config())
+            .build();
   }
 
   public int getPort() {
@@ -39,12 +65,6 @@ public class DefaultVerticle extends AbstractVerticle {
   public void start(Promise<Void> startPromise) {
     log.info("Starting verticle");
     vertx.exceptionHandler(throwable -> log.error("unhandled exception", throwable));
-    provider =
-        DaggerProvider.builder()
-            .vertx(vertx)
-            .appConfig(ApplicationConfig.fromJson(config()))
-            .config(config())
-            .build();
     provider.init();
 
     ServerFactory serverFactory = provider.serverFactory();
@@ -58,7 +78,7 @@ public class DefaultVerticle extends AbstractVerticle {
             res -> {
               if (res.succeeded()) {
                 log.info("listening for requests on port: {}", res.result().actualPort());
-                setHttpServer(res.result());
+                this.httpServer = res.result();
                 startPromise.complete();
               } else {
                 startPromise.fail(res.cause());

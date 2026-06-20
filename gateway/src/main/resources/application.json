@@ -1,5 +1,17 @@
 {
   "httpConfig": {
     "port": 8081
+  },
+  "gateway": {
+    "services": [
+      {
+        "name": "transactions",
+        "host": "127.0.0.1",
+        "port": 8082
+      }
+    ],
+    "jwt": {
+      "secret": "secret"
+    }
   }
 }

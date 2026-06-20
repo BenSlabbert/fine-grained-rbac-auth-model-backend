@@ -8,6 +8,7 @@ import github.benslabbert.vdw.codegen.config.ApplicationConfig_HttpConfigBuilder
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.auth.authentication.Credentials;
 import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
 import io.vertx.ext.web.client.WebClient;
@@ -15,7 +16,11 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.example.gateway.config.GatewayConfig;
+import org.example.gateway.config.GatewayConfigBuilder;
+import org.example.gateway.config.GatewayConfig_JwtBuilder;
 import org.example.gateway.verticle.DefaultVerticle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,15 +38,25 @@ public abstract class IntegrationTestBase {
 
   private volatile DefaultVerticle verticle;
 
+  /// Override this method if your test needs to customize the verticle.
+  /// Be sure to call [IntegrationTestBase#deployVerticle] with the adjusted config.
   @BeforeEach
-  void init(Vertx v, VertxTestContext tc) {
+  protected void init(Vertx v, VertxTestContext tc) {
+    GatewayConfig gatewayConfig =
+        GatewayConfigBuilder.builder()
+            .services(List.of())
+            .jwt(GatewayConfig_JwtBuilder.builder().secret(Buffer.buffer("secret")).build())
+            .build();
+    deployVerticle(v, tc, gatewayConfig);
+  }
+
+  protected void deployVerticle(Vertx v, VertxTestContext tc, GatewayConfig gatewayConfig) {
     ApplicationConfig applicationConfig =
         ApplicationConfigBuilder.builder()
             .httpConfig(ApplicationConfig_HttpConfigBuilder.builder().port(0).build())
             .profile(ApplicationConfig.Profile.DEV)
             .build();
-
-    verticle = new DefaultVerticle();
+    verticle = new DefaultVerticle(gatewayConfig);
     long start = System.currentTimeMillis();
     v.deployVerticle(
             verticle,

@@ -4,6 +4,7 @@ package org.example.gateway.web.route;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -12,14 +13,57 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.example.gateway.IntegrationTestBase;
+import org.example.gateway.config.GatewayConfig;
+import org.example.gateway.config.GatewayConfigBuilder;
+import org.example.gateway.config.GatewayConfig_JwtBuilder;
+import org.example.gateway.config.GatewayConfig_ServiceBuilder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DownstreamProxyHandlerTest extends IntegrationTestBase {
 
   private volatile HttpServer server;
+
+  @Override
+  @BeforeEach
+  protected void init(Vertx v, VertxTestContext tc) {
+    Router r = Router.router(v);
+    r.route(HttpMethod.GET, "/p1")
+        .handler(
+            ctx -> {
+              String jwtHeader = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
+              assertThat(jwtHeader).isNotNull();
+              assertThat(ctx.request().getHeader("X-custom-req")).isEqualTo("req-header");
+              ctx.response().putHeader("X-custom", "value").setStatusCode(200).end("body");
+            });
+    v.createHttpServer(new HttpServerOptions().setPort(0).setHost("0.0.0.0"))
+        .requestHandler(r)
+        .listen()
+        .onComplete(
+            tc.succeeding(
+                ar -> {
+                  server = ar;
+                  GatewayConfig gatewayConfig =
+                      GatewayConfigBuilder.builder()
+                          .jwt(
+                              GatewayConfig_JwtBuilder.builder()
+                                  .secret(Buffer.buffer("secret"))
+                                  .build())
+                          .services(
+                              List.of(
+                                  GatewayConfig_ServiceBuilder.builder()
+                                      .name("test")
+                                      .host("127.0.0.1")
+                                      .port(server.actualPort())
+                                      .build()))
+                          .build();
+                  deployVerticle(v, tc, gatewayConfig);
+                }));
+  }
 
   @AfterEach
   void after(VertxTestContext tc) {
@@ -30,30 +74,8 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
 
   @Test
   void test(Vertx v, VertxTestContext tc) {
-    Checkpoint downstreamServerCheckpoint = tc.checkpoint();
     Checkpoint loginCheckpoint = tc.checkpoint();
     Checkpoint testCompleteCheckpoint = tc.checkpoint();
-
-    var r = Router.router(v);
-    r.route(HttpMethod.GET, "/p1")
-        .handler(
-            ctx -> {
-              assertThat(ctx.request().getHeader("X-custom-req")).isEqualTo("req-header");
-              ctx.response().putHeader("X-custom", "value").setStatusCode(200).end("body");
-            });
-    var s =
-        v.createHttpServer(new HttpServerOptions().setPort(8082).setHost("0.0.0.0"))
-            .requestHandler(r);
-
-    s.listen()
-        .onFailure(tc::failNow)
-        .onSuccess(
-            ar -> {
-              server = ar;
-              downstreamServerCheckpoint.flag();
-            });
-
-    downstreamServerCheckpoint.await();
 
     AtomicReference<String> cookie = new AtomicReference<>();
 
@@ -76,7 +98,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
     loginCheckpoint.await();
 
     webClient
-        .get("/api/transactions/p1")
+        .get("/api/test/p1")
         .putHeader(HttpHeaders.COOKIE, cookie.get())
         .putHeader("X-custom-req", "req-header")
         .send()
