@@ -29,7 +29,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
   }
 
   @Test
-  void test(Vertx v, VertxTestContext tc) throws InterruptedException {
+  void test(Vertx v, VertxTestContext tc) {
     Checkpoint downstreamServerCheckpoint = tc.checkpoint();
     Checkpoint loginCheckpoint = tc.checkpoint();
     Checkpoint testCompleteCheckpoint = tc.checkpoint();
