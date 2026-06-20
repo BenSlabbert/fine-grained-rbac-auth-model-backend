@@ -44,7 +44,7 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
 // todo: this is a fix coming from
 // https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 //  to fix the self attaching agent issue
-//  it would be great i fwe didn't have to hard code the mockito version and can inherit it
+//  it would be great if we didn't have to hard code the mockito version and can inherit it
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {

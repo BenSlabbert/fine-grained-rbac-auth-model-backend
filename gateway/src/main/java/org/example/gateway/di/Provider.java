@@ -12,6 +12,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.example.gateway.config.ConfigModule;
+import org.example.gateway.config.GatewayConfig;
 import org.example.gateway.web.RouterFactory;
 import org.example.gateway.web.ServerFactory;
 import org.example.gateway.web.WebModule;
@@ -45,6 +46,9 @@ public interface Provider {
 
     @BindsInstance
     Builder appConfig(ApplicationConfig config);
+
+    @BindsInstance
+    Builder gatewayConfig(GatewayConfig gatewayConfig);
 
     @BindsInstance
     Builder config(JsonObject config);

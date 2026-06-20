@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.gateway.web.route;
 
+import static java.util.stream.Collectors.toMap;
+
 import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest;
@@ -18,6 +20,7 @@ import jakarta.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.example.gateway.config.GatewayConfig;
 
 @WebHandler(path = "/api")
 class DownstreamProxyHandler {
@@ -27,10 +30,10 @@ class DownstreamProxyHandler {
   private final JWTAuth provider;
 
   @Inject
-  DownstreamProxyHandler(Vertx vertx) {
+  DownstreamProxyHandler(Vertx vertx, GatewayConfig gatewayConfig) {
     this.serviceMap =
-        Map.of(
-            "transactions", new Service("127.0.0.1", 8082), "iam", new Service("127.0.0.1", 8002));
+        gatewayConfig.services().stream()
+            .collect(toMap(GatewayConfig.Service::name, s -> new Service(s.host(), s.port())));
     this.provider =
         JWTAuth.create(
             vertx,
@@ -39,7 +42,7 @@ class DownstreamProxyHandler {
                     new PubSecKeyOptions()
                         .setAlgorithm("HS256")
                         .setId("simple")
-                        .setBuffer("keyboard cat")));
+                        .setBuffer(gatewayConfig.jwt().secret())));
     this.httpClient = vertx.createHttpClient();
   }
 
