@@ -45,10 +45,7 @@ public class RouterFactory {
 
     router
         .route(HttpMethod.POST, "/login")
-        .handler(
-            ctx -> {
-              BasicAuthHandler.create(authenticationProvider).handle(ctx);
-            });
+        .handler(ctx -> BasicAuthHandler.create(authenticationProvider).handle(ctx));
 
     routerConfigurers.forEach(rc -> rc.route(router));
 
