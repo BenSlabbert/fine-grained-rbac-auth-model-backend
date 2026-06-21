@@ -7,26 +7,37 @@ import github.benslabbert.vdw.codegen.annotation.auth.HasRole;
 import github.benslabbert.vdw.codegen.annotation.web.WebHandler;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest;
 import github.benslabbert.vdw.codegen.annotation.web.WebRequest.All;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.VertxException;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
+import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.WebServerRequest;
+import io.vertx.httpproxy.*;
 import jakarta.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.example.gateway.config.GatewayConfig;
 
-@WebHandler(path = "/api")
+@WebHandler(path = "")
 class DownstreamProxyHandler {
 
+  private static final String API_PATH = "/api";
+  private static final String USER_CTX = "user";
+  private static final String SERVICE_CTX = "service";
+  private static final String SERVICE_NAME_CTX = "service_name";
+
   private final Map<String, Service> serviceMap;
-  private final HttpClientAgent httpClient;
+  private final Handler<HttpServerRequest> proxy;
   private final JWTAuth provider;
 
   @Inject
@@ -43,62 +54,91 @@ class DownstreamProxyHandler {
                         .setAlgorithm("HS256")
                         .setId("simple")
                         .setBuffer(gatewayConfig.jwt().secret())));
-    this.httpClient = vertx.createHttpClient();
+
+    this.proxy = getProxy(vertx);
+  }
+
+  private HttpProxy getProxy(Vertx vertx) {
+    ProxyOptions options =
+        new ProxyOptions()
+            .setCacheOptions(null) // disable
+            .setSupportWebSocket(false)
+            .setForwardedHeadersOptions(
+                new ForwardedHeadersOptions().setEnabled(true).setUseRfc7239(true));
+    return HttpProxy.reverseProxy(options, vertx.createHttpClient())
+        .addInterceptor(ProxyInterceptor.builder().removingPathPrefix(API_PATH).build())
+        .addInterceptor(
+            new ProxyInterceptor() {
+              @Override
+              public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
+                WebServerRequest wsr = (WebServerRequest) context.request().proxiedRequest();
+                RoutingContext ctx = wsr.routingContext();
+
+                var pathParams = DownstreamProxyHandler_All_ParamParser.parse(ctx.pathParams());
+
+                if (null == ctx.user()) {
+                  ProxyResponse proxyResponse =
+                      context
+                          .request()
+                          .response()
+                          .setStatusCode(401)
+                          .setStatusMessage("Unauthorized")
+                          .putHeader("Content-Type", "text/plain")
+                          .setBody(Body.body(Buffer.buffer("")));
+                  return Future.succeededFuture(proxyResponse);
+                }
+
+                Service service = serviceMap.get(pathParams.serviceName());
+
+                if (null == service) {
+                  ProxyResponse proxyResponse =
+                      context
+                          .request()
+                          .response()
+                          .setStatusCode(401)
+                          .setStatusMessage("Unauthorized")
+                          .putHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
+                          .setBody(Body.body(Buffer.buffer()));
+                  return Future.succeededFuture(proxyResponse);
+                }
+
+                context.set(USER_CTX, ctx.user());
+                context.set(SERVICE_CTX, service);
+                context.set(SERVICE_NAME_CTX, pathParams.serviceName());
+
+                return context.sendRequest();
+              }
+            })
+        .addInterceptor(
+            new ProxyInterceptor() {
+              @Override
+              public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
+                String s = context.get(SERVICE_NAME_CTX, String.class);
+                return ProxyInterceptor.builder()
+                    .removingPathPrefix("/%s".formatted(s))
+                    .build()
+                    .handleProxyRequest(context);
+              }
+            })
+        .origin(
+            OriginRequestProvider.selector(
+                proxyContext -> {
+                  var user = proxyContext.get(USER_CTX, User.class);
+                  var service = proxyContext.get(SERVICE_CTX, Service.class);
+                  var serviceName = proxyContext.get(SERVICE_NAME_CTX, String.class);
+                  String token = getToken(user.subject(), serviceName);
+                  proxyContext.request().putHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                  var origin = SocketAddress.inetSocketAddress(service.port, service.host);
+                  return Future.succeededFuture(origin);
+                }));
   }
 
   private record Service(String host, int port) {}
 
   @HasRole("admin")
-  @All(path = "/{string:serviceName}/*")
+  @All(path = API_PATH + "/{string:serviceName}/*")
   void all(@WebRequest.RoutingContext RoutingContext ctx) {
-    var pathParams = DownstreamProxyHandler_All_ParamParser.parse(ctx.pathParams());
-    HttpServerRequest request = ctx.request();
-    Service service = serviceMap.get(pathParams.serviceName());
-    if (null == service) {
-      ctx.response().setStatusCode(401).end();
-      return;
-    }
-    request.pause();
-    var requestOptions =
-        getRequestOptions(ctx.user().subject(), pathParams.serviceName(), request, service);
-
-    httpClient
-        .request(requestOptions)
-        .compose(
-            r -> {
-              request.resume();
-              return request.body().onFailure(VertxException::noStackTrace).compose(r::send);
-            })
-        .onComplete(
-            ar -> {
-              if (ar.failed()) {
-                ctx.response().setStatusCode(500).end();
-                return;
-              }
-
-              HttpClientResponse result = ar.result();
-              result.bodyHandler(
-                  body -> {
-                    HttpServerResponse response = ctx.response();
-                    result
-                        .headers()
-                        .forEach(header -> response.putHeader(header.getKey(), header.getValue()));
-                    response.setStatusCode(result.statusCode()).end(body);
-                  });
-            });
-  }
-
-  private RequestOptions getRequestOptions(
-      String subject, String serviceName, HttpServerRequest request, Service service) {
-    String uri = request.uri();
-    String path = uri.substring(("/api/" + serviceName).length());
-    return new RequestOptions()
-        .setMethod(request.method())
-        .setHost(service.host)
-        .setPort(service.port)
-        .setURI(path)
-        .setHeaders(request.headers())
-        .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getToken(subject, serviceName));
+    proxy.handle(ctx.request());
   }
 
   private String getToken(String subject, String serviceName) {
