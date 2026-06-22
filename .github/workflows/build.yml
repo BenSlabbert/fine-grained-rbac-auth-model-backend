@@ -16,7 +16,7 @@ jobs:
     steps:
     - name: "Install Podman"
       uses: "redhat-actions/podman-install@main"
-    - uses: "actions/checkout@v6"
+    - uses: "actions/checkout@v6.0.3"
     - name: "Initialize CodeQL"
       uses: "github/codeql-action/init@v4.36.2"
       with:
