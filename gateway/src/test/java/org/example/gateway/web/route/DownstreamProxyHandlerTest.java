@@ -9,10 +9,13 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.impl.jose.JWT;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
+import java.security.SignatureException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.example.gateway.IntegrationTestBase;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 class DownstreamProxyHandlerTest extends IntegrationTestBase {
 
+  private static final String SECRET = "secret";
   private volatile HttpServer server;
 
   @Override
@@ -37,6 +41,24 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
             ctx -> {
               String jwtHeader = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
               assertThat(jwtHeader).isNotNull();
+              String token = jwtHeader.replace("Bearer ", "");
+              String[] split = token.split("\\.");
+              assertThat(split).hasSize(3);
+              token = split[0] + "." + split[1];
+
+              try {
+                JWT jwt = new JWT();
+                JsonObject decode = jwt.decode(token);
+                assertThat(decode).isNotNull();
+                assertThat(decode.fieldNames())
+                    .containsExactlyInAnyOrder("jti", "nbf", "iat", "exp", "aud", "iss", "sub");
+                assertThat(decode.getString("iss")).isEqualTo("gateway");
+                assertThat(decode.getString("sub")).isEqualTo("name");
+                assertThat(decode.getJsonArray("aud")).containsExactlyInAnyOrder("test", "iam");
+              } catch (SignatureException e) {
+                tc.failNow(e);
+              }
+
               assertThat(ctx.request().getHeader("X-custom-req")).isEqualTo("req-header");
               ctx.response().putHeader("X-custom", "value").setStatusCode(200).end("body");
             });
@@ -51,7 +73,7 @@ class DownstreamProxyHandlerTest extends IntegrationTestBase {
                       GatewayConfigBuilder.builder()
                           .jwt(
                               GatewayConfig_JwtBuilder.builder()
-                                  .secret(Buffer.buffer("secret"))
+                                  .secret(Buffer.buffer(SECRET))
                                   .build())
                           .services(
                               List.of(
