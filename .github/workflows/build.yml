@@ -28,7 +28,7 @@ jobs:
         distribution: "graalvm"
     - run: "podman version"
     - name: "Setup Gradle"
-      uses: "gradle/actions/setup-gradle@v6.1.0"
+      uses: "gradle/actions/setup-gradle@v6.2.0"
     - name: "Build"
       run: "./gradlew clean build --console=plain --no-daemon"
     - name: "Perform CodeQL Analysis"
