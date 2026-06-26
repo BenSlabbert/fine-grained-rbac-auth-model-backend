@@ -32,6 +32,7 @@ jobs:
       uses: "gradle/actions/setup-gradle@v6.2.0"
       with:
         cache-provider: "basic"
+        gradle-version: "9.6.0"
     - name: "Build"
       run: "./gradlew build --console=plain --no-daemon"
     - name: "Perform CodeQL Analysis"
