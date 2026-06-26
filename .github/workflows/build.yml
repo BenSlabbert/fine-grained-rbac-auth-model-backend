@@ -1,6 +1,7 @@
 ---
 name: "Build"
 "on":
+  workflow_dispatch: null
   pull_request: null
   push:
     branches:
