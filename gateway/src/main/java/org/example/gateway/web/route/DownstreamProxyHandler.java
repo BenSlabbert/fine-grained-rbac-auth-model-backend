@@ -25,6 +25,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.WebServerRequest;
 import io.vertx.httpproxy.*;
 import jakarta.inject.Inject;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -157,27 +158,28 @@ class DownstreamProxyHandler {
 
   private record Service(String host, int port) {}
 
-  @HasRole("admin")
-  @All(path = API_PATH + "/{string:serviceName}/*")
-  void all(@WebRequest.RoutingContext RoutingContext ctx) {
-    proxy.handle(ctx.request());
-  }
-
   private String getToken(String subject, String serviceName) {
     // https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims
+    Duration expiration = Duration.ofSeconds(30L);
     return provider.generateToken(
         new JsonObject()
             // JWT ID
             .put("jti", UUID.randomUUID().toString())
             // not before time
-            .put("nbf", System.currentTimeMillis()),
+            .put("nbf", System.currentTimeMillis() / 1000),
         new JWTOptions()
             .setIgnoreExpiration(false)
             .setLeeway(100)
             .setSubject(subject)
-            .setExpiresInSeconds(30)
+            .setExpiresInSeconds((int) expiration.toSeconds())
             .setIssuer("gateway")
             // iam can view the token as well
             .setAudience(Set.of(serviceName, "iam").stream().toList()));
+  }
+
+  @HasRole("admin")
+  @All(path = API_PATH + "/{string:serviceName}/*")
+  void all(@WebRequest.RoutingContext RoutingContext ctx) {
+    proxy.handle(ctx.request());
   }
 }

@@ -4,12 +4,15 @@ package org.example.transactions.config;
 import github.benslabbert.vdw.codegen.commons.RoleAuthorizationHandlerProvider;
 import io.vertx.core.Future;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authorization.Authorization;
 import io.vertx.ext.auth.authorization.AuthorizationProvider;
 import io.vertx.ext.auth.authorization.OrAuthorization;
 import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.example.security.api.ApplicationUserPermissionsRequestBuilder;
 import org.example.security.api.SecurityService;
 
@@ -41,7 +44,7 @@ class AuthorizationHandlerProvider
 
   @Override
   public String getId() {
-    return "transactions";
+    return TransactionsConfig.APP_NAME;
   }
 
   @Override
@@ -53,15 +56,17 @@ class AuthorizationHandlerProvider
     return securityService
         .getApplicationUserPermissions(
             ApplicationUserPermissionsRequestBuilder.builder()
-                .application("transactions")
+                .application(TransactionsConfig.APP_NAME)
                 .user(user.subject())
                 .build())
-        .flatMap(
+        .map(
             r -> {
-              for (var p : r.permissions()) {
-                user.authorizations().put(getId(), RoleBasedAuthorization.create(p));
-              }
-              return Future.succeededFuture();
+              Set<Authorization> roles =
+                  r.permissions().stream()
+                      .map(RoleBasedAuthorization::create)
+                      .collect(Collectors.toSet());
+              user.authorizations().put(getId(), roles);
+              return null;
             });
   }
 }

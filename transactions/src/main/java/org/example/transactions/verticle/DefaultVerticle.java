@@ -3,11 +3,14 @@ package org.example.transactions.verticle;
 
 import github.benslabbert.vdw.codegen.config.ApplicationConfig;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import java.util.Objects;
 import org.example.security.api.SecurityServiceVertxEBClientProxy;
+import org.example.transactions.config.TransactionsConfig;
 import org.example.transactions.di.DaggerProvider;
 import org.example.transactions.di.Provider;
 import org.example.transactions.web.RouterFactory;
@@ -22,8 +25,33 @@ public class DefaultVerticle extends AbstractVerticle {
   private volatile HttpServer httpServer = null;
   private volatile Provider provider = null;
 
-  private void setHttpServer(HttpServer httpServer) {
-    this.httpServer = httpServer;
+  private final TransactionsConfig transactionsConfig;
+
+  // required for vert.x
+  public DefaultVerticle() {
+    this(null);
+  }
+
+  public DefaultVerticle(TransactionsConfig transactionsConfig) {
+    this.transactionsConfig = transactionsConfig;
+  }
+
+  @Override
+  public void init(Vertx vertx, Context context) {
+    log.info("init verticle");
+    super.init(vertx, context);
+
+    provider =
+        DaggerProvider.builder()
+            .vertx(vertx)
+            .appConfig(ApplicationConfig.fromJson(config()))
+            .transactionsConfig(
+                null == transactionsConfig
+                    ? TransactionsConfig.create(config().getJsonObject(TransactionsConfig.APP_NAME))
+                    : transactionsConfig)
+            .securityService(new SecurityServiceVertxEBClientProxy(vertx))
+            .config(config())
+            .build();
   }
 
   public int getPort() {
@@ -40,13 +68,6 @@ public class DefaultVerticle extends AbstractVerticle {
   public void start(Promise<Void> startPromise) {
     log.info("Starting verticle");
     vertx.exceptionHandler(throwable -> log.error("unhandled exception", throwable));
-    provider =
-        DaggerProvider.builder()
-            .vertx(vertx)
-            .appConfig(ApplicationConfig.fromJson(config()))
-            .config(config())
-            .securityService(new SecurityServiceVertxEBClientProxy(vertx))
-            .build();
     provider.init();
 
     ServerFactory serverFactory = provider.serverFactory();
@@ -60,7 +81,7 @@ public class DefaultVerticle extends AbstractVerticle {
             res -> {
               if (res.succeeded()) {
                 log.info("listening for requests on port: {}", res.result().actualPort());
-                setHttpServer(res.result());
+                this.httpServer = res.result();
                 startPromise.complete();
               } else {
                 startPromise.fail(res.cause());

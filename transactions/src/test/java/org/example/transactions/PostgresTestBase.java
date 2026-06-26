@@ -12,14 +12,24 @@ import github.benslabbert.vdw.codegen.config.ApplicationConfig_PostgresConfigBui
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
-import io.vertx.ext.auth.authentication.Credentials;
-import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.JWTOptions;
+import io.vertx.ext.auth.PubSecKeyOptions;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import java.time.Duration;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.example.transactions.config.TransactionsConfig;
+import org.example.transactions.config.TransactionsConfigBuilder;
+import org.example.transactions.config.TransactionsConfig_JwtBuilder;
 import org.example.transactions.verticle.DefaultVerticle;
 import org.example.utilities.FlywayUtility;
 import org.junit.jupiter.api.AfterAll;
@@ -38,8 +48,7 @@ public abstract class PostgresTestBase {
   private static final Logger log = LoggerFactory.getLogger(PostgresTestBase.class);
 
   public static final PostgreSQLContainer POSTGRES = DockerContainers.POSTGRES;
-  public static final Credentials ADMIN_AUTH =
-      new UsernamePasswordCredentials("name", "password").applyHttpChallenge(null);
+  protected volatile JWTAuth jwtAuth;
 
   @BeforeAll
   static void start() {
@@ -87,7 +96,22 @@ public abstract class PostgresTestBase {
             .profile(ApplicationConfig.Profile.DEV)
             .build();
 
-    verticle = new DefaultVerticle();
+    TransactionsConfig transactionsConfig =
+        TransactionsConfigBuilder.builder()
+            .jwt(TransactionsConfig_JwtBuilder.builder().secret(Buffer.buffer("secret")).build())
+            .build();
+
+    jwtAuth =
+        JWTAuth.create(
+            v,
+            new JWTAuthOptions()
+                .addPubSecKey(
+                    new PubSecKeyOptions()
+                        .setAlgorithm("HS256")
+                        .setId("simple")
+                        .setBuffer(transactionsConfig.jwt().secret())));
+
+    verticle = new DefaultVerticle(transactionsConfig);
     long start = System.currentTimeMillis();
     v.deployVerticle(
             verticle,
@@ -114,6 +138,24 @@ public abstract class PostgresTestBase {
     webClientOptions.setDefaultHost("127.0.0.1");
     webClientOptions.setDefaultPort(getPort());
     return WebClient.create(vertx, webClientOptions);
+  }
+
+  protected String getToken(String subject) {
+    // todo: duplicate in gateway
+    Duration expiration = Duration.ofSeconds(30L);
+    return jwtAuth.generateToken(
+        new JsonObject()
+            // JWT ID
+            .put("jti", UUID.randomUUID().toString())
+            // not before time
+            .put("nbf", System.currentTimeMillis() / 1000),
+        new JWTOptions()
+            .setIgnoreExpiration(false)
+            .setLeeway(100)
+            .setSubject(subject)
+            .setExpiresInSeconds((int) expiration.toSeconds())
+            .setIssuer("gateway")
+            .setAudience(Set.of(TransactionsConfig.APP_NAME, "iam").stream().toList()));
   }
 
   @AfterEach

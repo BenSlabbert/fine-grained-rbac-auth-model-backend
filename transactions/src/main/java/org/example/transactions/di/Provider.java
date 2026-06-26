@@ -16,6 +16,7 @@ import jakarta.inject.Singleton;
 import javax.sql.DataSource;
 import org.example.security.api.SecurityService;
 import org.example.transactions.config.ConfigModule;
+import org.example.transactions.config.TransactionsConfig;
 import org.example.transactions.external.ExternalModule;
 import org.example.transactions.web.RouterFactory;
 import org.example.transactions.web.ServerFactory;
@@ -59,6 +60,9 @@ public interface Provider {
 
     @BindsInstance
     Builder appConfig(ApplicationConfig config);
+
+    @BindsInstance
+    Builder transactionsConfig(TransactionsConfig transactionsConfig);
 
     @BindsInstance
     Builder config(JsonObject config);

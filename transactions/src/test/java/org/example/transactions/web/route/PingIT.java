@@ -2,18 +2,17 @@
 package org.example.transactions.web.route;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.junit5.VertxTestContext;
 import java.util.List;
-import org.example.security.api.ApplicationUserPermissionsResponseBuilder;
-import org.example.security.api.SecurityService;
-import org.example.security.api.SecurityServiceVertxEBProxyHandler_Factory;
+import org.example.security.api.*;
 import org.example.transactions.PostgresTestBase;
+import org.example.transactions.config.TransactionsConfig;
 import org.junit.jupiter.api.Test;
 
 class PingIT extends PostgresTestBase {
@@ -24,16 +23,22 @@ class PingIT extends PostgresTestBase {
     var proxyHandler = SecurityServiceVertxEBProxyHandler_Factory.newInstance(v, securityService);
     proxyHandler.register();
 
-    when(securityService.getApplicationUserPermissions(any()))
+    when(securityService.getApplicationUserPermissions(
+            ApplicationUserPermissionsRequestBuilder.builder()
+                .user("username")
+                .application(TransactionsConfig.APP_NAME)
+                .build()))
         .thenReturn(
             Future.succeededFuture(
                 ApplicationUserPermissionsResponseBuilder.builder()
                     .permissions(List.of("admin"))
                     .build()));
 
+    String token = getToken("username");
+
     getWebClient(v)
         .get("/ping")
-        .authentication(ADMIN_AUTH)
+        .authentication(new TokenCredentials(token).applyHttpChallenge(null))
         .send()
         .onComplete(
             tc.succeeding(
