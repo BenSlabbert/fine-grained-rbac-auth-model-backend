@@ -57,8 +57,14 @@ tasks.withType<Test>().configureEach {
     minHeapSize = "64m"
     maxHeapSize = "128m"
     jvmArgs("--enable-native-access=ALL-UNNAMED", "-javaagent:${mockitoAgent.asPath}")
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 4).coerceIn(1, 4)
+    maxParallelForks = getForkCount()
     environment("DOCKER_HOST", "unix:///run/user/$uid/podman/podman.sock")
     environment("TESTCONTAINERS_RYUK_DISABLED", "true")
     environment("TESTCONTAINERS_HOST_OVERRIDE", "127.0.0.1")
+}
+
+fun getForkCount(): Int {
+    val forks = (Runtime.getRuntime().availableProcessors())
+    logger.lifecycle("maxParallelForks: $forks")
+    return forks
 }
