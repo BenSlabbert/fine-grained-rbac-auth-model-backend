@@ -5,6 +5,8 @@ import dagger.BindsInstance;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
+import github.benslabbert.vdw.codegen.aop.cache.CacheAdviceExecutor;
+import github.benslabbert.vdw.codegen.aop.cache.CacheManager;
 import github.benslabbert.vdw.codegen.commons.eb.EventBusServiceConfigurer;
 import github.benslabbert.vdw.codegen.config.ApplicationConfig;
 import github.benslabbert.vdw.codegen.txmanager.PlatformTransactionManager;
@@ -39,6 +41,8 @@ import org.slf4j.LoggerFactory;
       ExternalModule.class
     })
 public interface Provider {
+
+  String PERMISSIONS_CACHE = "permissions-cache";
 
   Logger log = LoggerFactory.getLogger(Provider.class);
 
@@ -83,8 +87,10 @@ public interface Provider {
     EagerModule() {}
 
     @Provides
-    @Nullable static Void provideEager(TransactionManager transactionManager, DataSource dataSource) {
+    @Nullable static Void provideEager(
+        TransactionManager transactionManager, DataSource dataSource, CacheManager cacheManager) {
       log.info("eager init");
+      CacheAdviceExecutor.setCacheManager(cacheManager);
       PlatformTransactionManager.setTransactionManager(transactionManager);
       FlywayUtility.migrate(dataSource);
       return null;

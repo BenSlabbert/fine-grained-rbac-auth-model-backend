@@ -11,6 +11,8 @@ dependencies {
     implementation(libs.vdw.logging)
     implementation(libs.vdw.annotation)
     implementation(libs.vdw.platform)
+    implementation(libs.vdw.aop)
+    implementation(libs.vdw.advice.transformer)
     implementation(project(":utilities"))
     implementation(project(":security-api"))
     compileOnly(libs.google.auto.annotations)
