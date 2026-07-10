@@ -8,9 +8,8 @@ import dagger.Provides;
 import github.benslabbert.vdw.codegen.aop.cache.Cache;
 import github.benslabbert.vdw.codegen.aop.cache.CacheManager;
 import jakarta.inject.Singleton;
-import java.util.Map;
+import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Module
 final class CacheProvider {
@@ -30,21 +29,26 @@ final class CacheProvider {
 
   private static final Cache IN_MEMORY_CACHE =
       new Cache() {
-        private static final Map<String, Object> m = new ConcurrentHashMap<>();
+        private static final com.google.common.cache.Cache<String, Object> GUAVA_CACHE =
+            com.google.common.cache.CacheBuilder.newBuilder()
+                .initialCapacity(64)
+                .maximumSize(4096)
+                .expireAfterWrite(Duration.ofSeconds(10L))
+                .build();
 
         @Override
         public Object get(String key) {
-          return m.get(key);
+          return GUAVA_CACHE.getIfPresent(key);
         }
 
         @Override
         public void put(String key, Object value) {
-          m.put(key, value);
+          GUAVA_CACHE.put(key, value);
         }
 
         @Override
         public void evict(String key) {
-          m.remove(key);
+          GUAVA_CACHE.invalidate(key);
         }
       };
 }
