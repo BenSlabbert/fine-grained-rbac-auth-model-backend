@@ -9,6 +9,7 @@ import github.benslabbert.vdw.codegen.commons.jdbc.JdbcTransactionManagerModule;
       // internal modules
       ConfigModuleBindings.class,
       DataSourceProvider.class,
+      CacheProvider.class,
       // external modules
       JdbcTransactionManagerModule.class
     })

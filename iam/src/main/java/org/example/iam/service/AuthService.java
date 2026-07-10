@@ -1,6 +1,9 @@
 /* Licensed under Apache-2.0 2026. */
 package org.example.iam.service;
 
+import static org.example.iam.di.Provider.PERMISSIONS_CACHE;
+
+import github.benslabbert.vdw.codegen.annotation.advice.Cache;
 import github.benslabbert.vdw.codegen.annotation.transaction.Transactional;
 import github.benslabbert.vdw.codegen.commons.jdbc.JdbcQueryRunner;
 import github.benslabbert.vdw.codegen.commons.jdbc.JdbcQueryRunnerFactory;
@@ -41,6 +44,7 @@ public class AuthService {
     this.pspRepository = pspRepository;
   }
 
+  @Cache.Put(value = PERMISSIONS_CACHE, key = "#0-#1")
   public List<String> getApplicationUserPermissions(String appName, String userName) {
     try (var s =
         jdbcUtils.streamInTransaction(
@@ -61,6 +65,7 @@ public class AuthService {
     }
   }
 
+  @Cache.Put(value = PERMISSIONS_CACHE, key = "#0-#1-#2")
   public boolean hasPermission(String appName, String userName, String permission) {
     return jdbcUtils.doInTransaction(
         _ ->
@@ -155,6 +160,7 @@ public class AuthService {
         merchantId);
   }
 
+  @Cache.Put(value = PERMISSIONS_CACHE, key = "#0-#1")
   public boolean userHasMerchantGroupScope(String userName, String merchantGroupName) {
     return jdbcUtils.doInTransaction(
         _ ->
