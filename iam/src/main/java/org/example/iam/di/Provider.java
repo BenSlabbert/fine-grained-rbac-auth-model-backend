@@ -58,6 +58,8 @@ public interface Provider {
 
   default void closeSilently() {
     try {
+      log.info("Clear cache manager");
+      CacheAdviceExecutor.clearCacheManager();
       log.info("Closing transaction manager");
       PlatformTransactionManager.close();
     } catch (Exception e) {
