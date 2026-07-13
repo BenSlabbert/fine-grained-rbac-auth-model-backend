@@ -19,7 +19,8 @@ class SecurityServiceImplIT extends PostgresTestBase {
 
   @BeforeEach
   void setUp(Vertx v) {
-    var opts = new DeliveryOptions();
+    String machineToken = getMachineToken("other-service");
+    var opts = new DeliveryOptions().addHeader("auth-token", machineToken);
     securityService = new SecurityServiceVertxEBClientProxy(v, opts);
   }
 

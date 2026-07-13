@@ -9,7 +9,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import java.util.Objects;
-import org.example.security.api.SecurityServiceVertxEBClientProxy;
 import org.example.transactions.config.TransactionsConfig;
 import org.example.transactions.di.DaggerProvider;
 import org.example.transactions.di.Provider;
@@ -49,7 +48,6 @@ public class DefaultVerticle extends AbstractVerticle {
                 null == transactionsConfig
                     ? TransactionsConfig.create(config().getJsonObject(TransactionsConfig.APP_NAME))
                     : transactionsConfig)
-            .securityService(new SecurityServiceVertxEBClientProxy(vertx))
             .config(config())
             .build();
   }
