@@ -48,7 +48,7 @@ public abstract class PostgresTestBase {
   private static final Logger log = LoggerFactory.getLogger(PostgresTestBase.class);
 
   public static final PostgreSQLContainer POSTGRES = DockerContainers.POSTGRES;
-  protected volatile JWTAuth jwtAuth;
+  private volatile JWTAuth apiJwtAuth;
 
   @BeforeAll
   static void start() {
@@ -101,14 +101,14 @@ public abstract class PostgresTestBase {
             .jwt(TransactionsConfig_JwtBuilder.builder().secret(Buffer.buffer("secret")).build())
             .build();
 
-    jwtAuth =
+    apiJwtAuth =
         JWTAuth.create(
             v,
             new JWTAuthOptions()
                 .addPubSecKey(
                     new PubSecKeyOptions()
                         .setAlgorithm("HS256")
-                        .setId("simple")
+                        .setId("api-jwt")
                         .setBuffer(transactionsConfig.jwt().secret())));
 
     verticle = new DefaultVerticle(transactionsConfig);
@@ -140,10 +140,10 @@ public abstract class PostgresTestBase {
     return WebClient.create(vertx, webClientOptions);
   }
 
-  protected String getToken(String subject) {
+  protected String getApiToken(String subject) {
     // todo: duplicate in gateway
     Duration expiration = Duration.ofSeconds(30L);
-    return jwtAuth.generateToken(
+    return apiJwtAuth.generateToken(
         new JsonObject()
             // JWT ID
             .put("jti", UUID.randomUUID().toString())

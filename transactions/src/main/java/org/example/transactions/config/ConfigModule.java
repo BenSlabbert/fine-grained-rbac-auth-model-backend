@@ -10,6 +10,7 @@ import github.benslabbert.vdw.codegen.commons.jdbc.JdbcTransactionManagerModule;
       ConfigModuleBindings.class,
       DataSourceProvider.class,
       JWTAuthProvider.class,
+      SecurityServiceProvider.class,
       // external modules
       JdbcTransactionManagerModule.class
     })

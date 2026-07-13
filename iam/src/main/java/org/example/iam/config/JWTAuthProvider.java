@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2024. */
-package org.example.transactions.config;
+package org.example.iam.config;
 
 import dagger.Module;
 import dagger.Provides;
@@ -15,24 +15,10 @@ final class JWTAuthProvider {
 
   private JWTAuthProvider() {}
 
-  @Named("api-jwt")
-  @Singleton
-  @Provides
-  static JWTAuth apiJwtAuth(Vertx vertx, TransactionsConfig transactionsConfig) {
-    return JWTAuth.create(
-        vertx,
-        new JWTAuthOptions()
-            .addPubSecKey(
-                new PubSecKeyOptions()
-                    .setAlgorithm("HS256")
-                    .setId("api-jwt")
-                    .setBuffer(transactionsConfig.jwt().secret())));
-  }
-
   @Named("machine-jwt")
   @Singleton
   @Provides
-  static JWTAuth machineJwtAuth(Vertx vertx, TransactionsConfig transactionsConfig) {
+  static JWTAuth machineJwtAuth(Vertx vertx) {
     return JWTAuth.create(
         vertx,
         new JWTAuthOptions()
@@ -40,6 +26,6 @@ final class JWTAuthProvider {
                 new PubSecKeyOptions()
                     .setAlgorithm("HS256")
                     .setId("machine-jwt")
-                    .setBuffer(transactionsConfig.jwt().secret())));
+                    .setBuffer("secret")));
   }
 }

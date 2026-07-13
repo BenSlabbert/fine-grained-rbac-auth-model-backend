@@ -14,10 +14,8 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import javax.sql.DataSource;
-import org.example.security.api.SecurityService;
 import org.example.transactions.config.ConfigModule;
 import org.example.transactions.config.TransactionsConfig;
-import org.example.transactions.external.ExternalModule;
 import org.example.transactions.web.RouterFactory;
 import org.example.transactions.web.ServerFactory;
 import org.example.transactions.web.WebModule;
@@ -26,13 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Component(
-    modules = {
-      Provider.EagerModule.class,
-      ConfigModule.class,
-      WebModule.class,
-      ExternalModule.class
-    })
+@Component(modules = {Provider.EagerModule.class, ConfigModule.class, WebModule.class})
 public interface Provider {
 
   Logger log = LoggerFactory.getLogger(Provider.class);
@@ -66,9 +58,6 @@ public interface Provider {
 
     @BindsInstance
     Builder config(JsonObject config);
-
-    @BindsInstance
-    Builder securityService(SecurityService securityService);
 
     Provider build();
   }

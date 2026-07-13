@@ -7,6 +7,7 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.*;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -22,7 +23,8 @@ public class RouterFactory {
   private final Vertx vertx;
 
   @Inject
-  RouterFactory(Set<RouterConfigurer> routerConfigurers, JWTAuth jwtAuth, Vertx vertx) {
+  RouterFactory(
+      Set<RouterConfigurer> routerConfigurers, @Named("api-jwt") JWTAuth jwtAuth, Vertx vertx) {
     this.routerConfigurers = routerConfigurers;
     this.jwtAuth = jwtAuth;
     this.vertx = vertx;
