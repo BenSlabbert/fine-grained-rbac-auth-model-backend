@@ -3,7 +3,7 @@ vdw = "4.85.0"
 hibernate-validator = "9.1.1.Final"
 org-mapstruct-mapstruct = "1.6.3"
 flyway = "12.10.0"
-postgresql = "42.7.11"
+postgresql = "42.7.12"
 google-auto = "1.11.1"
 
 [libraries]
