@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.11.1")
+    implementation("org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:1.1.4")
 }
 
 spotless {
