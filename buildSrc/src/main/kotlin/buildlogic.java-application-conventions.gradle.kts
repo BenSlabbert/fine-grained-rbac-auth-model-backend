@@ -16,3 +16,5 @@ graalvmNative {
         }
     }
 }
+
+dependencies { runtimeOnly("joda-time:joda-time:2.13.1") }
