@@ -13,6 +13,7 @@ graalvmNative {
         named("main") {
             buildArgs.add("-O0")
             buildArgs.add("-R:MinHeapSize=16m")
+            buildArgs.add("-R:MaxHeapSize=16m")
         }
     }
 }
