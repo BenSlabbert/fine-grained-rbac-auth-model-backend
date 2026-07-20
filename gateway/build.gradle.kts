@@ -10,8 +10,8 @@ dependencies {
     implementation(libs.vdw.platform)
     implementation(project(":security-api"))
     // todo: needs to come from parent deps
-    implementation("io.vertx:vertx-auth-jwt:5.1.3")
-    implementation("io.vertx:vertx-http-proxy:5.1.3")
+    implementation("io.vertx:vertx-auth-jwt:5.1.4")
+    implementation("io.vertx:vertx-http-proxy:5.1.4")
     compileOnly(libs.google.auto.annotations)
 
     testImplementation(testFixtures(libs.vdw.commons.test))
