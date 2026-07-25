@@ -1,5 +1,13 @@
 plugins { id("buildlogic.java-application-conventions") }
 
+val baseLayerPath: String? = project.findProperty("baseLayerPath") as String?
+
+if (baseLayerPath != null) {
+    graalvmNative {
+        binaries { named("main") { buildArgs.add("--layer-use=$baseLayerPath") } }
+    }
+}
+
 dependencies {
     implementation(libs.org.mapstruct.mapstruct)
     implementation(libs.vdw.launcher)

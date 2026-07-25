@@ -6,6 +6,6 @@ plugins {
 
 rootProject.name = "backend"
 
-include("iam", "utilities", "security-api", "transactions", "gateway")
+include("iam", "utilities", "security-api", "transactions", "gateway", "base-layer")
 
 develocity { buildScan { publishing { onlyIf { false } } } }

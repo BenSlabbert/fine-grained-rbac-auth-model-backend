@@ -7,7 +7,33 @@ name: "Native Image"
     branches:
     - "main"
 jobs:
+  base-layer:
+    runs-on: "ubuntu-latest"
+    env:
+      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
+    permissions:
+      contents: "read"
+    steps:
+    - uses: "actions/checkout@v7.0.0"
+    - name: "Set up Java 25"
+      uses: "actions/setup-java@v5.4.0"
+      with:
+        java-version: "25.0.3"
+        distribution: "graalvm"
+    - name: "Setup Gradle"
+      uses: "gradle/actions/setup-gradle@v6.2.0"
+      with:
+        cache-provider: "basic"
+        gradle-version: "9.6.1"
+    - name: "Build base layer"
+      run: "./gradlew :base-layer:nativeCompile --console=plain --no-daemon"
+    - name: "Upload base layer"
+      uses: "actions/upload-artifact@v4"
+      with:
+        name: "base-layer-nil"
+        path: "base-layer/build/native/nativeCompile/base-layer.nil"
   native-image:
+    needs: "base-layer"
     runs-on: "ubuntu-latest"
     env:
       GH_TOKEN: "${{ secrets.GH_TOKEN }}"
@@ -32,5 +58,12 @@ jobs:
       with:
         cache-provider: "basic"
         gradle-version: "9.6.1"
+    - name: "Download base layer"
+      uses: "actions/download-artifact@v4"
+      with:
+        name: "base-layer-nil"
+        path: "base-layer/build/native/nativeCompile/"
     - name: "Build native image (${{ matrix.app }})"
-      run: "./gradlew :${{ matrix.app }}:nativeCompile --console=plain --no-daemon"
+      run: "./gradlew :${{ matrix.app }}:nativeCompile -PbaseLayerPath=${{ github.workspace\
+        \ }}/base-layer/build/native/nativeCompile/base-layer.nil --console=plain\
+        \ --no-daemon"
