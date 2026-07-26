@@ -4,7 +4,12 @@ val baseLayerPath: String? = project.findProperty("baseLayerPath") as String?
 
 if (baseLayerPath != null) {
     graalvmNative {
-        binaries { named("main") { buildArgs.add("--layer-use=$baseLayerPath") } }
+        binaries {
+            named("main") {
+                buildArgs.add("-H:+UnlockExperimentalVMOptions")
+                buildArgs.add("-H:LayerUse=$baseLayerPath")
+            }
+        }
     }
 }
 

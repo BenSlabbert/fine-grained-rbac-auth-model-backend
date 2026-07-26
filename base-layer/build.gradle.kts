@@ -9,13 +9,11 @@ graalvmNative {
         named("main") {
             // Capture a set of commonly-used JDK modules into a reusable .nil layer file so that
             // gateway, iam and transactions can skip reanalysing and recompiling them.
-            val layerFile =
-                layout.buildDirectory
-                    .file("native/nativeCompile/base-layer.nil")
-                    .get()
-                    .asFile
+            // The correct hosted-option name is -H:LayerCreate (not --layer-create), and it
+            // requires -H:+UnlockExperimentalVMOptions to be passed first.
+            buildArgs.add("-H:+UnlockExperimentalVMOptions")
             buildArgs.add(
-                "--layer-create=${layerFile.absolutePath}" +
+                "-H:LayerCreate=base-layer.nil" +
                     ",module=java.base" +
                     ",module=java.logging" +
                     ",module=java.sql" +
