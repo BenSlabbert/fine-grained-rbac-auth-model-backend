@@ -19,7 +19,7 @@ jobs:
       uses: "redhat-actions/podman-install@main"
     - uses: "actions/checkout@v7.0.0"
     - name: "Initialize CodeQL"
-      uses: "github/codeql-action/init@v4.36.3"
+      uses: "github/codeql-action/init@v4.37.1"
       with:
         languages: "java-kotlin"
     - name: "Set up Java 25"
@@ -36,4 +36,4 @@ jobs:
     - name: "Build"
       run: "./gradlew build --console=plain --no-daemon"
     - name: "Perform CodeQL Analysis"
-      uses: "github/codeql-action/analyze@v4.36.3"
+      uses: "github/codeql-action/analyze@v4.37.1"
