@@ -10,6 +10,10 @@ repositories {
     gradlePluginPortal()
 }
 
+dependencies {
+    implementation("org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:1.1.4")
+}
+
 spotless {
     kotlinGradle {
         target("*.gradle.kts", "src/**/*.gradle.kts")

@@ -10,7 +10,11 @@ val localEnv =
         }
     }
 
-val gprUser = providers.provider { localEnv.getProperty("gpr.user") }.orElse("BenSlabbert")
+val gprUser =
+    providers
+        .environmentVariable("GITHUB_ACTOR")
+        .orElse(providers.provider { localEnv.getProperty("gpr.user") })
+        .orElse("BenSlabbert")
 
 val gprKey =
     providers
@@ -36,6 +40,7 @@ repositories {
             username = gprUser.get()
             password = gprKey.get()
         }
+        authentication { create<BasicAuthentication>("basic") }
     }
 }
 
