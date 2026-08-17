@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":utilities"))
     implementation(project(":security-api"))
     // todo: needs to come from parent deps
-    implementation("io.vertx:vertx-auth-jwt:5.1.5")
+    implementation("io.vertx:vertx-auth-jwt:5.1.6")
     compileOnly(libs.google.auto.annotations)
 
     runtimeOnly(libs.postgresql)
